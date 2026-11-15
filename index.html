@@ -33,30 +33,22 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg font-bold tracking-tight text-white">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Bearer Auth</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">API B3 Live</span>
           </div>
           <p class="text-xs text-slate-400">Simulador de Proventos & Relatórios Gerenciais</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs">
-          <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
-          <span class="text-slate-400">Status:</span>
-          <span id="last-sync-time" class="font-medium text-slate-200">Pronto</span>
-        </div>
-
         <button onclick="openApiModal()" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300 transition">
           <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
           <span id="api-badge-label" class="hidden sm:inline">API B3</span>
         </button>
-
         <button onclick="openParserModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition">
           <i data-lucide="file-text" class="w-3.5 h-3.5 text-sky-400"></i>
           <span class="hidden sm:inline">Ler RG (IA)</span>
         </button>
-
-        <button id="sync-btn" onclick="syncB3AndReports()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition">
+        <button id="sync-btn" onclick="syncAllPortfolioWithB3()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition">
           <i id="sync-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Sincronizar B3</span>
         </button>
@@ -64,18 +56,10 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto border-t border-slate-800/70">
-      <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn active px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap">
-        <i data-lucide="briefcase" class="w-4 h-4"></i> Minha Carteira
-      </button>
-      <button onclick="switchTab('sandbox')" id="tab-sandbox" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-        <i data-lucide="flask-conical" class="w-4 h-4"></i> Simulador Avulso
-      </button>
-      <button onclick="switchTab('snowball')" id="tab-snowball" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-        <i data-lucide="sparkles" class="w-4 h-4"></i> Bola de Neve
-      </button>
-      <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-        <i data-lucide="newspaper" class="w-4 h-4"></i> Feed RG & Logs
-      </button>
+      <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn active px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap"><i data-lucide="briefcase" class="w-4 h-4"></i> Minha Carteira</button>
+      <button onclick="switchTab('sandbox')" id="tab-sandbox" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="flask-conical" class="w-4 h-4"></i> Simulador Avulso</button>
+      <button onclick="switchTab('snowball')" id="tab-snowball" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="sparkles" class="w-4 h-4"></i> Bola de Neve</button>
+      <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="newspaper" class="w-4 h-4"></i> Feed RG & Logs</button>
     </div>
   </header>
 
@@ -110,18 +94,18 @@
       <div class="glass-card rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII à Carteira</h2>
-            <p class="text-xs text-slate-400">Digite qualquer FII (ex: CPTS11, MXRF11, HGLG11) ou inclua direto se faltar.</p>
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII da B3</h2>
+            <p class="text-xs text-slate-400">Digite qualquer ticker (ex: SNAG11, SNEL11, CPTS11) para buscar cotação real na bolsa.</p>
           </div>
-          <span class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 self-start">+200 FIIs Indexados</span>
+          <span class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 self-start">Busca Universal B3</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div class="md:col-span-5 relative">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar Ticker ou Nome</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar Ticker na B3</label>
             <div class="relative">
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="portfolio-search-input" placeholder="Ex: CPTS11, KNCR11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onfocus="handleSearchInput('portfolio', this.value)" onkeydown="handleSearchKeydown(event, 'portfolio')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
+              <input type="text" id="portfolio-search-input" placeholder="Ex: SNAG11, SNEL11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onfocus="handleSearchInput('portfolio', this.value)" onkeydown="handleSearchKeydown(event, 'portfolio')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
               <button onclick="clearSearch('portfolio')" id="portfolio-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div id="portfolio-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
@@ -153,7 +137,7 @@
             <span id="sel-badge-name" class="text-slate-200 font-medium"></span>
             <span id="sel-badge-sector" class="text-slate-400"></span>
           </div>
-          <span id="sel-badge-rg" class="text-sky-400 italic"></span>
+          <span id="sel-badge-rg" class="text-sky-400 italic">Buscando dados na B3...</span>
         </div>
       </div>
 
@@ -200,17 +184,17 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i> Simulador Avulso (Sem Comprar)</h2>
-            <p class="text-xs text-slate-400">Teste fundos livremente antes de decidir investir.</p>
+            <p class="text-xs text-slate-400">Teste fundos buscando direto da B3.</p>
           </div>
           <span class="text-[11px] px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 self-start">Isolado</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div class="md:col-span-4 relative">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar FII</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar FII na B3</label>
             <div class="relative">
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="sandbox-search-input" placeholder="Ex: CPTS11..." autocomplete="off" oninput="handleSearchInput('sandbox', this.value)" onfocus="handleSearchInput('sandbox', this.value)" onkeydown="handleSearchKeydown(event, 'sandbox')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 uppercase" />
+              <input type="text" id="sandbox-search-input" placeholder="Ex: SNAG11, CPTS11..." autocomplete="off" oninput="handleSearchInput('sandbox', this.value)" onfocus="handleSearchInput('sandbox', this.value)" onkeydown="handleSearchKeydown(event, 'sandbox')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 uppercase" />
               <button onclick="clearSearch('sandbox')" id="sandbox-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div id="sandbox-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
@@ -379,61 +363,51 @@
   </div>
 
   <script>
-    const RAW_FIIS = [
-      ["CPTS11", "Capitânia Securities II", "Papel / CRI", 7.15, 0.088, "Carteira high grade indexada IPCA+8,4%."],
-      ["MXRF11", "Maxi Renda", "Papel / CRI", 9.65, 0.095, "Maior base de cotistas da B3."],
-      ["HGLG11", "CSHG Logística", "Logística", 156.80, 1.10, "Vacância abaixo de 4%."],
-      ["XPML11", "XP Malls", "Shopping", 104.50, 0.92, "Vendas/m² em forte alta."],
-      ["KNCR11", "Kinea Rendimentos", "Papel / CRI", 102.90, 1.05, "Portfólio 99% CDI+2,35%."],
-      ["KNIP11", "Kinea Índice de Preços", "Papel / CRI", 91.40, 0.85, "CRIs IPCA+."],
-      ["KNRI11", "Kinea Renda Imobiliária", "Híbrido", 142.30, 1.00, "Logística e lajes AAA."],
-      ["VISC11", "Vinci Shopping", "Shopping", 106.20, 0.82, "NOI caixa crescente."],
-      ["BTLG11", "BTG Logística", "Logística", 98.50, 0.78, "Foco raio 30km SP."],
-      ["XPLG11", "XP Log", "Logística", 99.10, 0.78, "Grandes varejistas."]
-    ];
-
     let fiiCatalog = [];
     let portfolio = [];
     let sandboxBasket = [];
     let rgLogs = [];
-    let selectedPortfolioFii = null;
-    let selectedSandboxFii = null;
-    let activeDropdownIndex = -1;
     let sectorChartInstance = null;
     let snowballChartInstance = null;
 
     function init() {
-      const savedCatalog = localStorage.getItem('fii_pulse_catalog_v4');
+      const savedCatalog = localStorage.getItem('fii_pulse_catalog_v6');
       if (savedCatalog) {
         fiiCatalog = JSON.parse(savedCatalog);
       } else {
-        fiiCatalog = RAW_FIIS.map(([ticker, name, sector, price, div, rg]) => ({ ticker, name, sector, price, div, rg }));
+        fiiCatalog = [
+          { ticker: "CPTS11", name: "Capitânia Securities II", sector: "Papel / CRI", price: 6.88, div: 0.09, rg: "Busca dinâmica ativa." },
+          { ticker: "SNAG11", name: "Suno Agro", sector: "Fiagro", price: 9.57, div: 0.12, rg: "Busca dinâmica ativa." },
+          { ticker: "SNEL11", name: "Suno Energias Limpas", sector: "Híbrido", price: 7.24, div: 0.05, rg: "Busca dinâmica ativa." },
+          { ticker: "MXRF11", name: "Maxi Renda", sector: "Papel / CRI", price: 9.65, div: 0.095, rg: "Busca dinâmica ativa." },
+          { ticker: "HGLG11", name: "CSHG Logística", sector: "Logística", price: 156.80, div: 1.10, rg: "Busca dinâmica ativa." }
+        ];
         saveCatalog();
       }
 
-      const savedPortfolio = localStorage.getItem('fii_pulse_portfolio_v4');
+      const savedPortfolio = localStorage.getItem('fii_pulse_portfolio_v6');
       if (savedPortfolio) {
         portfolio = JSON.parse(savedPortfolio);
       } else {
         portfolio = [
           { ticker: "CPTS11", quotas: 150 },
-          { ticker: "MXRF11", quotas: 200 },
-          { ticker: "HGLG11", quotas: 15 }
+          { ticker: "SNAG11", quotas: 200 },
+          { ticker: "SNEL11", quotas: 100 }
         ];
         savePortfolio();
       }
 
-      const savedBasket = localStorage.getItem('fii_pulse_basket_v4');
+      const savedBasket = localStorage.getItem('fii_pulse_basket_v6');
       if (savedBasket) sandboxBasket = JSON.parse(savedBasket);
 
-      const savedLogs = localStorage.getItem('fii_pulse_logs_v4');
+      const savedLogs = localStorage.getItem('fii_pulse_logs_v6');
       if (savedLogs) {
         rgLogs = JSON.parse(savedLogs);
       } else {
-        addLog("Sistema", "FII Pulse inicializado com sucesso.");
+        addLog("Sistema", "FII Pulse inicializado com API B3 Live.");
       }
 
-      selectFii('sandbox', getFiiByTicker("CPTS11") || fiiCatalog[0]);
+      selectFii('sandbox', fiiCatalog[0]);
       updateApiBadge();
       renderAll();
       lucide.createIcons();
@@ -448,17 +422,13 @@
       });
     }
 
-    function saveCatalog() { localStorage.setItem('fii_pulse_catalog_v4', JSON.stringify(fiiCatalog)); }
-    function savePortfolio() { localStorage.setItem('fii_pulse_portfolio_v4', JSON.stringify(portfolio)); }
-    function saveBasket() { localStorage.setItem('fii_pulse_basket_v4', JSON.stringify(sandboxBasket)); }
-    function saveLogs() { localStorage.setItem('fii_pulse_logs_v4', JSON.stringify(rgLogs)); }
+    function saveCatalog() { localStorage.setItem('fii_pulse_catalog_v6', JSON.stringify(fiiCatalog)); }
+    function savePortfolio() { localStorage.setItem('fii_pulse_portfolio_v6', JSON.stringify(portfolio)); }
+    function saveBasket() { localStorage.setItem('fii_pulse_basket_v6', JSON.stringify(sandboxBasket)); }
+    function saveLogs() { localStorage.setItem('fii_pulse_logs_v6', JSON.stringify(rgLogs)); }
 
     function getFiiByTicker(ticker) {
       return fiiCatalog.find(f => f.ticker.toUpperCase() === ticker.toUpperCase());
-    }
-
-    function normalizeStr(str) {
-      return (str || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     }
 
     function formatBRL(val) {
@@ -498,38 +468,25 @@
       if (tab === 'snowball') updateSnowball();
     }
 
-    function handleSearchInput(context, rawQuery) {
+    // BUSCA UNIVERSAL NA API B3 AO DIGITAR
+    async function handleSearchInput(context, rawQuery) {
       const dropdown = document.getElementById(`${context}-dropdown`);
       const clearBtn = document.getElementById(`${context}-clear-btn`);
-      const query = normalizeStr(rawQuery);
-      activeDropdownIndex = -1;
+      const cleanTicker = rawQuery.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
       if (rawQuery.trim().length > 0) clearBtn.classList.remove('hidden');
       else clearBtn.classList.add('hidden');
 
-      let matches = fiiCatalog;
-      if (query) {
-        matches = fiiCatalog.filter(f => normalizeStr(f.ticker).includes(query) || normalizeStr(f.name).includes(query));
+      if (cleanTicker.length < 2) {
+        dropdown.classList.add('hidden');
+        return;
       }
 
-      const topMatches = matches.slice(0, 10);
-      const cleanTicker = rawQuery.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      const exactExists = fiiCatalog.some(f => f.ticker.toUpperCase() === cleanTicker);
+      // Filtrar locais existentes
+      let matches = fiiCatalog.filter(f => f.ticker.includes(cleanTicker) || f.name.toUpperCase().includes(cleanTicker));
 
       let html = '';
-      if (cleanTicker.length >= 4 && !exactExists) {
-        html += `
-          <div onclick="quickCreateAndSelect('${context}', '${cleanTicker}')" class="dropdown-item p-3 bg-emerald-500/10 hover:bg-emerald-500/20 cursor-pointer flex items-center justify-between transition">
-            <div>
-              <div class="text-xs font-bold text-emerald-400">+ Incluir ${cleanTicker} na Hora</div>
-              <div class="text-[11px] text-slate-400">Cadastrar com dados padrão</div>
-            </div>
-          </div>
-        `;
-      }
-
-      topMatches.forEach(f => {
-        const dy = f.price > 0 ? ((f.div / f.price) * 100).toFixed(2) : "0.00";
+      matches.forEach(f => {
         html += `
           <div onclick="selectFiiByTicker('${context}', '${f.ticker}')" class="dropdown-item p-2.5 hover:bg-slate-800 cursor-pointer flex items-center justify-between transition">
             <div>
@@ -547,19 +504,23 @@
         `;
       });
 
+      // Se tiver 4 ou mais letras e não estiver na lista local, buscar direto da B3 via API
+      if (cleanTicker.length >= 4 && !getFiiByTicker(cleanTicker)) {
+        html += `
+          <div onclick="fetchAndSelectFromB3('${context}', '${cleanTicker}')" class="dropdown-item p-3 bg-emerald-500/15 hover:bg-emerald-500/25 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <i data-lucide="cloud-download" class="w-4 h-4"></i> Buscar ${cleanTicker} direto da B3
+              </div>
+              <div class="text-[11px] text-slate-300">Puxar cotação e proventos reais da bolsa</div>
+            </div>
+          </div>
+        `;
+      }
+
       dropdown.innerHTML = html;
       dropdown.classList.remove('hidden');
       lucide.createIcons();
-    }
-
-    function handleSearchKeydown(e, context) {
-      const dropdown = document.getElementById(`${context}-dropdown`);
-      const items = dropdown.querySelectorAll('.dropdown-item');
-      if (dropdown.classList.contains('hidden') || items.length === 0) return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); activeDropdownIndex = (activeDropdownIndex + 1) % items.length; }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); activeDropdownIndex = (activeDropdownIndex - 1 + items.length) % items.length; }
-      else if (e.key === 'Enter') { e.preventDefault(); (activeDropdownIndex >= 0 ? items[activeDropdownIndex] : items[0]).click(); }
-      else if (e.key === 'Escape') dropdown.classList.add('hidden');
     }
 
     function clearSearch(context) {
@@ -569,18 +530,61 @@
       if (context === 'portfolio') { selectedPortfolioFii = null; document.getElementById('portfolio-selected-info').classList.add('hidden'); }
     }
 
+    async function fetchAndSelectFromB3(context, ticker) {
+      const formatted = ticker.endsWith('11') || ticker.endsWith('11B') ? ticker : `${ticker}11`;
+      showToast(`Consultando ${formatted} na B3...`, 'info');
+
+      const token = localStorage.getItem('fii_pulse_brapi_token') || '';
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+      try {
+        const res = await fetch(`https://brapi.dev/api/quote/${formatted}?dividends=true`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.results?.[0]) {
+            const item = data.results[0];
+            const price = item.regularMarketPrice || 10.00;
+            let div = 0.09;
+            const cashDivs = item.dividendsData?.cashDividends;
+            if (Array.isArray(cashDivs) && cashDivs.length > 0) {
+              const sorted = [...cashDivs].sort((a, b) => new Date(b.paymentDate || b.approvedOn) - new Date(a.paymentDate || a.approvedOn));
+              if (sorted[0]?.rate > 0) div = Number(sorted[0].rate);
+            }
+
+            const newFii = {
+              ticker: formatted,
+              name: item.shortName || item.longName || `Fundo ${formatted}`,
+              sector: item.sector || "FII / B3",
+              price: Number(price),
+              div: Number(div),
+              rg: `Importado da B3 em ${new Date().toLocaleDateString('pt-BR')}.`
+            };
+
+            fiiCatalog.unshift(newFii);
+            saveCatalog();
+            selectFii(context, newFii);
+            showToast(`${formatted} carregado com sucesso da B3!`);
+            return;
+          }
+        }
+      } catch(e) { console.warn("Erro ao buscar da B3", e); }
+
+      // Fallback caso falhe
+      quickCreateAndSelect(context, formatted);
+    }
+
     function selectFiiByTicker(context, ticker) { selectFii(context, getFiiByTicker(ticker)); }
 
     function quickCreateAndSelect(context, ticker) {
       const formatted = ticker.endsWith('11') || ticker.endsWith('11B') ? ticker : `${ticker}11`;
       let existing = getFiiByTicker(formatted);
       if (!existing) {
-        existing = { ticker: formatted, name: `Fundo ${formatted}`, sector: "Híbrido", price: 10.00, div: 0.09, rg: "Cadastrado manualmente." };
+        existing = { ticker: formatted, name: `Fundo ${formatted}`, sector: "FII / B3", price: 10.00, div: 0.09, rg: "Cadastrado manualmente." };
         fiiCatalog.unshift(existing);
         saveCatalog();
       }
       selectFii(context, existing);
-      showToast(`${formatted} cadastrado com sucesso!`);
+      showToast(`${formatted} selecionado!`);
     }
 
     function selectFii(context, fii) {
@@ -620,21 +624,16 @@
       document.getElementById('api-badge-label').textContent = token ? 'API B3 (Pro)' : 'API B3';
     }
 
-    async function syncB3AndReports() {
+    async function syncAllPortfolioWithB3() {
       const icon = document.getElementById('sync-icon');
       const btn = document.getElementById('sync-btn');
       icon.classList.add('animate-spin');
       btn.disabled = true;
 
       const token = localStorage.getItem('fii_pulse_brapi_token') || '';
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
       const tickers = Array.from(new Set([...portfolio.map(p => p.ticker)]));
-      let successCount = 0;
-
-      // Configuração correta com Header Authorization Bearer exigida pela brapi
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      let updatedCount = 0;
 
       for (const t of tickers) {
         try {
@@ -646,25 +645,25 @@
               const fii = getFiiByTicker(t);
               if (fii && item.regularMarketPrice > 0) {
                 fii.price = Number(item.regularMarketPrice);
-                successCount++;
+                const cashDivs = item.dividendsData?.cashDividends;
+                if (Array.isArray(cashDivs) && cashDivs.length > 0) {
+                  const sorted = [...cashDivs].sort((a, b) => new Date(b.paymentDate || b.approvedOn) - new Date(a.paymentDate || a.approvedOn));
+                  if (sorted[0]?.rate > 0) fii.div = Number(sorted[0].rate);
+                }
+                updatedCount++;
               }
             }
           }
-        } catch(e) { console.warn("API offline ou bloqueada", e); }
+        } catch(e) { console.warn("Erro ao atualizar", e); }
       }
 
-      // Fallback local caso algum fundo não retorne na API
-      fiiCatalog.forEach(f => {
-        const delta = 1 + ((Math.random() - 0.49) * 0.006);
-        f.price = Number((f.price * delta).toFixed(2));
-      });
       saveCatalog();
       renderAll();
 
       icon.classList.remove('animate-spin');
       btn.disabled = false;
-      addLog("Sincronização B3", `Mercado sincronizado (${successCount} fundos atualizados via API Bearer).`);
-      showToast("Sincronização com a B3 concluída!");
+      addLog("Sincronização B3", `${updatedCount} fundos atualizados com cotações e dividendos reais da B3.`);
+      showToast(`${updatedCount} FIIs atualizados com sucesso!`);
     }
 
     function addSelectedToPortfolio() {
@@ -676,7 +675,7 @@
       const qty = parseInt(document.getElementById('portfolio-qty').value, 10) || 10;
 
       if (!fii) {
-        fii = { ticker: raw, name: `Fundo ${raw}`, sector: "Híbrido", price: p, div: d, rg: "Manual." };
+        fii = { ticker: raw, name: `Fundo ${raw}`, sector: "FII / B3", price: p, div: d, rg: "Adicionado manualmente." };
         fiiCatalog.unshift(fii);
         saveCatalog();
       }
@@ -705,7 +704,7 @@
     }
 
     function resetDefaultPortfolio() {
-      portfolio = [{ ticker: "CPTS11", quotas: 150 }, { ticker: "MXRF11", quotas: 200 }];
+      portfolio = [{ ticker: "CPTS11", quotas: 150 }, { ticker: "SNAG11", quotas: 200 }, { ticker: "SNEL11", quotas: 100 }];
       savePortfolio();
       renderAll();
     }
@@ -752,7 +751,7 @@
       if (!item) return;
       let fii = getFiiByTicker(item.ticker);
       if (!fii) {
-        fii = { ticker: item.ticker, name: `Fundo ${item.ticker}`, sector: "Híbrido", price: item.price, div: item.div, rg: "Promovido." };
+        fii = { ticker: item.ticker, name: `Fundo ${item.ticker}`, sector: "FII / B3", price: item.price, div: item.div, rg: "Promovido." };
         fiiCatalog.unshift(fii);
         saveCatalog();
       }
@@ -785,7 +784,7 @@
       const newDiv = parseFloat(valueMatch[1].replace(',', '.'));
       let fii = getFiiByTicker(ticker);
       if (fii) fii.div = newDiv;
-      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "Híbrido", price: newDiv * 100, div: newDiv, rg: text.slice(0, 100) }; fiiCatalog.unshift(fii); }
+      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "FII / B3", price: newDiv * 100, div: newDiv, rg: text.slice(0, 100) }; fiiCatalog.unshift(fii); }
       saveCatalog();
       closeParserModal();
       renderAll();
@@ -799,7 +798,7 @@
       tbody.innerHTML = portfolio.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Carteira vazia.</td></tr>` : '';
 
       portfolio.forEach(pos => {
-        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "Híbrido", price: 10, div: 0.08 };
+        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "FII / B3", price: 10, div: 0.08 };
         const val = pos.quotas * fii.price;
         const monthly = pos.quotas * fii.div;
         const magic = fii.div > 0 ? Math.ceil(fii.price / fii.div) : 0;
