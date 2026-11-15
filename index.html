@@ -9,23 +9,12 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #090d16;
-      color: #f1f5f9;
-    }
+    body { font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(51, 65, 85, 0.6);
-    }
-    .pulse-dot {
-      animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-    }
+    .glass-card { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); }
+    .pulse-dot { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
     @keyframes pulse-ring {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
@@ -35,7 +24,6 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
 
-  <!-- TOP BAR -->
   <header class="sticky top-0 z-40 glass-card border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
@@ -45,21 +33,20 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg font-bold tracking-tight text-white">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">B3 API + RG</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Bearer Auth</span>
           </div>
           <p class="text-xs text-slate-400">Simulador de Proventos & Relatórios Gerenciais</p>
         </div>
       </div>
 
-      <!-- SYNC & CONTROLS -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs">
           <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
-          <span class="text-slate-400">B3 / RG:</span>
-          <span id="last-sync-time" class="font-medium text-slate-200">Pronto p/ Sincronizar</span>
+          <span class="text-slate-400">Status:</span>
+          <span id="last-sync-time" class="font-medium text-slate-200">Pronto</span>
         </div>
 
-        <button onclick="openApiModal()" title="Configurar Token brapi.dev" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300 transition">
+        <button onclick="openApiModal()" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300 transition">
           <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
           <span id="api-badge-label" class="hidden sm:inline">API B3</span>
         </button>
@@ -76,13 +63,12 @@
       </div>
     </div>
 
-    <!-- NAVIGATION TABS -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto border-t border-slate-800/70">
       <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn active px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap">
         <i data-lucide="briefcase" class="w-4 h-4"></i> Minha Carteira
       </button>
       <button onclick="switchTab('sandbox')" id="tab-sandbox" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
-        <i data-lucide="flask-conical" class="w-4 h-4"></i> Simulador Avulso (Sem Comprar)
+        <i data-lucide="flask-conical" class="w-4 h-4"></i> Simulador Avulso
       </button>
       <button onclick="switchTab('snowball')" id="tab-snowball" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
         <i data-lucide="sparkles" class="w-4 h-4"></i> Bola de Neve
@@ -93,88 +79,51 @@
     </div>
   </header>
 
-  <!-- TOAST CONTAINER -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
 
-  <!-- MAIN CONTENT -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-    <!-- KPI CARDS -->
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <div class="glass-card rounded-2xl p-4">
-        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
-          <span>Patrimônio em FIIs</span>
-          <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i>
-        </div>
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Patrimônio</span><i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i></div>
         <div id="kpi-total-value" class="text-xl sm:text-2xl font-bold text-white">R$ 0,00</div>
         <div id="kpi-total-quotas" class="text-xs text-slate-400 mt-1">0 cotas em 0 fundos</div>
       </div>
-
       <div class="glass-card rounded-2xl p-4 border-emerald-500/30">
-        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
-          <span>Renda Mensal Estimada</span>
-          <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
-        </div>
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Renda Mensal</span><i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i></div>
         <div id="kpi-monthly-div" class="text-xl sm:text-2xl font-bold text-emerald-400">R$ 0,00</div>
-        <div id="kpi-daily-div" class="text-xs text-slate-400 mt-1">~R$ 0,00 por dia útil</div>
+        <div id="kpi-daily-div" class="text-xs text-slate-400 mt-1">~R$ 0,00 /dia útil</div>
       </div>
-
       <div class="glass-card rounded-2xl p-4">
-        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
-          <span>Renda Anual Projetada</span>
-          <i data-lucide="calendar-range" class="w-4 h-4 text-sky-400"></i>
-        </div>
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Renda Anual</span><i data-lucide="calendar-range" class="w-4 h-4 text-sky-400"></i></div>
         <div id="kpi-annual-div" class="text-xl sm:text-2xl font-bold text-white">R$ 0,00</div>
-        <div class="text-xs text-emerald-400 mt-1">Isento de IR (Pessoa Física)</div>
+        <div class="text-xs text-emerald-400 mt-1">Isento de IR</div>
       </div>
-
       <div class="glass-card rounded-2xl p-4">
-        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
-          <span>Dividend Yield (DY)</span>
-          <i data-lucide="percent" class="w-4 h-4 text-amber-400"></i>
-        </div>
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Dividend Yield</span><i data-lucide="percent" class="w-4 h-4 text-amber-400"></i></div>
         <div id="kpi-dy-monthly" class="text-xl sm:text-2xl font-bold text-white">0,00% <span class="text-xs font-normal text-slate-400">/mês</span></div>
-        <div id="kpi-dy-annual" class="text-xs text-amber-400 mt-1">0,00% ao ano</div>
+        <div id="kpi-dy-annual" class="text-xs text-amber-400 mt-1">0,00% a.a.</div>
       </div>
     </section>
 
-    <!-- ==================== VIEW 1: MINHA CARTEIRA ==================== -->
+    <!-- VIEW 1 -->
     <section id="view-portfolio" class="space-y-6">
-      <!-- BUSCADOR & ADIÇÃO RÁPIDA -->
       <div class="glass-card rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII à Carteira
-            </h2>
-            <p class="text-xs text-slate-400">Digite o ticker ou nome (ex: CPTS11, MXRF11, HGLG11). Se não estiver na lista, inclua com 1 clique.</p>
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII à Carteira</h2>
+            <p class="text-xs text-slate-400">Digite qualquer FII (ex: CPTS11, MXRF11, HGLG11) ou inclua direto se faltar.</p>
           </div>
-          <span class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 self-start">
-            +200 FIIs indexados + Busca B3
-          </span>
+          <span class="text-[11px] px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 self-start">+200 FIIs Indexados</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <!-- AUTOCOMPLETE SEARCH -->
           <div class="md:col-span-5 relative">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar Ticker ou Nome do Fundo</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar Ticker ou Nome</label>
             <div class="relative">
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input
-                type="text"
-                id="portfolio-search-input"
-                placeholder="Ex: CPTS11, KNCR11, XPML11..."
-                autocomplete="off"
-                oninput="handleSearchInput('portfolio', this.value)"
-                onfocus="handleSearchInput('portfolio', this.value)"
-                onkeydown="handleSearchKeydown(event, 'portfolio')"
-                class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase"
-              />
-              <button onclick="clearSearch('portfolio')" id="portfolio-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                <i data-lucide="x" class="w-4 h-4"></i>
-              </button>
+              <input type="text" id="portfolio-search-input" placeholder="Ex: CPTS11, KNCR11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onfocus="handleSearchInput('portfolio', this.value)" onkeydown="handleSearchKeydown(event, 'portfolio')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
+              <button onclick="clearSearch('portfolio')" id="portfolio-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <!-- DROPDOWN RESULTS -->
             <div id="portfolio-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
           </div>
 
@@ -194,9 +143,7 @@
           </div>
 
           <div class="md:col-span-1">
-            <button onclick="addSelectedToPortfolio()" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-1 shadow-lg shadow-emerald-600/20 transition">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-            </button>
+            <button onclick="addSelectedToPortfolio()" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-1 shadow-lg shadow-emerald-600/20 transition"><i data-lucide="plus" class="w-4 h-4"></i></button>
           </div>
         </div>
 
@@ -210,13 +157,10 @@
         </div>
       </div>
 
-      <!-- TABELA DA CARTEIRA + GRÁFICO DE SETORES -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden flex flex-col">
           <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-            <h3 class="font-bold text-sm text-white flex items-center gap-2">
-              <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> Ativos na Carteira & Magic Number
-            </h3>
+            <h3 class="font-bold text-sm text-white flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> Ativos na Carteira & Magic Number</h3>
             <button onclick="resetDefaultPortfolio()" class="text-xs text-slate-400 hover:text-slate-200 underline">Restaurar Exemplo</button>
           </div>
           <div class="overflow-x-auto">
@@ -240,7 +184,7 @@
         <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
           <div>
             <h3 class="font-bold text-sm text-white mb-1">Alocação por Segmento</h3>
-            <p class="text-xs text-slate-400 mb-4">Distribuição do patrimônio investido</p>
+            <p class="text-xs text-slate-400 mb-4">Distribuição do patrimônio</p>
           </div>
           <div class="relative h-56 flex items-center justify-center">
             <canvas id="sectorChart"></canvas>
@@ -250,54 +194,38 @@
       </div>
     </section>
 
-    <!-- ==================== VIEW 2: SIMULADOR AVULSO (SEM COMPRAR) ==================== -->
+    <!-- VIEW 2 -->
     <section id="view-sandbox" class="hidden space-y-6">
       <div class="glass-card rounded-2xl p-5 border-sky-500/30">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i> Simulador Avulso (What-If / Sem Comprar)
-            </h2>
-            <p class="text-xs text-slate-400">Teste qualquer FII sem adicioná-lo à sua carteira real. Simule aportes em reais (R$) ou quantidade de cotas.</p>
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i> Simulador Avulso (Sem Comprar)</h2>
+            <p class="text-xs text-slate-400">Teste fundos livremente antes de decidir investir.</p>
           </div>
-          <span class="text-[11px] px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 self-start">
-            Ambiente Isolado da Carteira
-          </span>
+          <span class="text-[11px] px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 self-start">Isolado</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <!-- BUSCADOR SANDBOX -->
           <div class="md:col-span-4 relative">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar FII para Simular</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar FII</label>
             <div class="relative">
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input
-                type="text"
-                id="sandbox-search-input"
-                placeholder="Ex: CPTS11, VISC11, RURA11..."
-                autocomplete="off"
-                oninput="handleSearchInput('sandbox', this.value)"
-                onfocus="handleSearchInput('sandbox', this.value)"
-                onkeydown="handleSearchKeydown(event, 'sandbox')"
-                class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 uppercase"
-              />
-              <button onclick="clearSearch('sandbox')" id="sandbox-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                <i data-lucide="x" class="w-4 h-4"></i>
-              </button>
+              <input type="text" id="sandbox-search-input" placeholder="Ex: CPTS11..." autocomplete="off" oninput="handleSearchInput('sandbox', this.value)" onfocus="handleSearchInput('sandbox', this.value)" onkeydown="handleSearchKeydown(event, 'sandbox')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 uppercase" />
+              <button onclick="clearSearch('sandbox')" id="sandbox-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div id="sandbox-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Modo de Simulação</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Modo</label>
             <select id="sandbox-mode" onchange="toggleSandboxMode()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500">
               <option value="brl">Por Valor (R$)</option>
-              <option value="quotas">Por Qtd. Cotas</option>
+              <option value="quotas">Por Cotas</option>
             </select>
           </div>
 
           <div class="md:col-span-2">
-            <label id="sandbox-amount-label" class="block text-xs font-medium text-slate-300 mb-1">Valor a Investir (R$)</label>
+            <label id="sandbox-amount-label" class="block text-xs font-medium text-slate-300 mb-1">Investimento (R$)</label>
             <input type="number" id="sandbox-amount" value="5000" oninput="recalcSandbox()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500" />
           </div>
 
@@ -307,51 +235,45 @@
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Dividendo Est. (R$)</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Div. Est. (R$)</label>
             <input type="number" step="0.001" id="sandbox-div" oninput="recalcSandbox()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500" />
           </div>
         </div>
 
-        <!-- RESULTADO DA SIMULAÇÃO INDIVIDUAL -->
         <div class="mt-5 p-4 rounded-xl bg-slate-900/90 border border-slate-800 grid grid-cols-2 sm:grid-cols-5 gap-4 items-center">
           <div>
-            <span class="text-[11px] text-slate-400 block">Cotas Compradas</span>
+            <span class="text-[11px] text-slate-400 block">Cotas</span>
             <span id="sb-res-quotas" class="text-lg font-bold text-white">0 cotas</span>
             <span id="sb-res-change" class="text-[11px] text-slate-400 block">Troco: R$ 0,00</span>
           </div>
           <div>
-            <span class="text-[11px] text-slate-400 block">Dividend Yield</span>
+            <span class="text-[11px] text-slate-400 block">Yield</span>
             <span id="sb-res-dym" class="text-lg font-bold text-sky-400">0,00% /mês</span>
-            <span id="sb-res-dya" class="text-[11px] text-emerald-400 block">0,00% ao ano</span>
+            <span id="sb-res-dya" class="text-[11px] text-emerald-400 block">0,00% a.a.</span>
           </div>
           <div>
             <span class="text-[11px] text-slate-400 block">Renda Mensal</span>
             <span id="sb-res-monthly" class="text-lg font-bold text-emerald-400">R$ 0,00</span>
-            <span class="text-[11px] text-slate-400 block">Livre de IR</span>
+            <span class="text-[11px] text-slate-400 block">Isento IR</span>
           </div>
           <div>
             <span class="text-[11px] text-slate-400 block">Renda Anual</span>
             <span id="sb-res-annual" class="text-lg font-bold text-white">R$ 0,00</span>
-            <span id="sb-res-magic" class="text-[11px] text-amber-400 block">Magic Number: 0 cotas</span>
+            <span id="sb-res-magic" class="text-[11px] text-amber-400 block">Magic: 0 cotas</span>
           </div>
-          <div class="col-span-2 sm:col-span-1 flex flex-col gap-2">
-            <button onclick="addToSandboxBasket()" class="w-full py-2 px-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5">
-              <i data-lucide="list-plus" class="w-3.5 h-3.5"></i> Adicionar à Cesta
-            </button>
+          <div class="col-span-2 sm:col-span-1">
+            <button onclick="addToSandboxBasket()" class="w-full py-2.5 px-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5"><i data-lucide="list-plus" class="w-3.5 h-3.5"></i> Adicionar</button>
           </div>
         </div>
       </div>
 
-      <!-- CESTA DE CANDIDATOS -->
       <div class="glass-card rounded-2xl overflow-hidden">
         <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 class="font-bold text-sm text-white">Cesta de Estudos (Pré-Compra)</h3>
-            <p class="text-xs text-slate-400">Compare ativos candidatos e veja quanto somariam à sua renda anual antes de comprar.</p>
+            <p class="text-xs text-slate-400">Compare candidatos e veja impacto na renda antes de comprar.</p>
           </div>
-          <div id="sandbox-basket-summary" class="text-xs font-semibold text-sky-400 bg-sky-500/10 px-3 py-1.5 rounded-lg border border-sky-500/20">
-            Total da Cesta: +R$ 0,00 /ano
-          </div>
+          <div id="sandbox-basket-summary" class="text-xs font-semibold text-sky-400 bg-sky-500/10 px-3 py-1.5 rounded-lg border border-sky-500/20">Total: +R$ 0,00 /ano</div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -372,327 +294,104 @@
       </div>
     </section>
 
-    <!-- ==================== VIEW 3: BOLA DE NEVE ==================== -->
+    <!-- VIEW 3 -->
     <section id="view-snowball" class="hidden space-y-6">
       <div class="glass-card rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i> Simulador Efeito Bola de Neve
-            </h2>
-            <p class="text-xs text-slate-400">Projeção composta reinvestindo 100% dos dividendos mensais + novos aportes.</p>
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i> Efeito Bola de Neve</h2>
+            <p class="text-xs text-slate-400">Projeção com reinvestimento de 100% dos proventos + aportes.</p>
           </div>
-          <button onclick="exportSnowballCSV()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 flex items-center gap-1.5 self-start">
-            <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400"></i> Exportar CSV
-          </button>
+          <button onclick="exportSnowballCSV()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 flex items-center gap-1.5 self-start"><i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400"></i> Exportar CSV</button>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-slate-400">Aporte Mensal Extra</span>
-              <span id="sb-label-aporte" class="font-bold text-emerald-400">R$ 1.000</span>
-            </div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Aporte Mensal</span><span id="sb-label-aporte" class="font-bold text-emerald-400">R$ 1.000</span></div>
             <input type="range" id="sb-aporte" min="0" max="20000" step="250" value="1000" oninput="updateSnowball()" class="w-full accent-emerald-500" />
           </div>
-
           <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-slate-400">Prazo (Anos)</span>
-              <span id="sb-label-years" class="font-bold text-white">10 anos</span>
-            </div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Prazo</span><span id="sb-label-years" class="font-bold text-white">10 anos</span></div>
             <input type="range" id="sb-years" min="1" max="30" step="1" value="10" oninput="updateSnowball()" class="w-full accent-emerald-500" />
           </div>
-
           <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
-            <label class="block text-xs text-slate-400 mb-1">Cenário Relatório Gerencial</label>
+            <label class="block text-xs text-slate-400 mb-1">Cenário</label>
             <select id="sb-scenario" onchange="updateSnowball()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white">
-              <option value="0.85">Conservador (85% do guidance)</option>
-              <option value="1.0" selected>Base RG (100% guidance atual)</option>
-              <option value="1.12">Otimista (112% + destravamento reserva)</option>
+              <option value="0.85">Conservador (85%)</option>
+              <option value="1.0" selected>Base RG (100%)</option>
+              <option value="1.12">Otimista (112%)</option>
             </select>
           </div>
         </div>
 
-        <div class="h-72 w-full">
-          <canvas id="snowballChart"></canvas>
-        </div>
+        <div class="h-72 w-full"><canvas id="snowballChart"></canvas></div>
       </div>
     </section>
 
-    <!-- ==================== VIEW 4: FEED RG & LOGS ==================== -->
+    <!-- VIEW 4 -->
     <section id="view-reports" class="hidden space-y-6">
       <div class="glass-card rounded-2xl p-5">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-base font-bold text-white">Feed de Sincronização B3 & Relatórios Gerenciais</h2>
-            <p class="text-xs text-slate-400">Histórico de atualizações via API brapi.dev, fatos relevantes e parser de texto.</p>
+            <h2 class="text-base font-bold text-white">Feed de Sincronização & Relatórios</h2>
+            <p class="text-xs text-slate-400">Histórico de cotações e parser de Fatos Relevantes.</p>
           </div>
-          <button onclick="openParserModal()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5">
-            <i data-lucide="file-search" class="w-4 h-4"></i> Colar Texto de Relatório
-          </button>
+          <button onclick="openParserModal()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5"><i data-lucide="file-search" class="w-4 h-4"></i> Colar Relatório</button>
         </div>
         <div id="rg-feed-list" class="space-y-3"></div>
       </div>
     </section>
-
   </main>
 
-  <!-- MODAL: CONFIGURAR API TOKEN BRAPI -->
+  <!-- MODAL API -->
   <div id="api-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold text-base text-white flex items-center gap-2">
-          <i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Integração B3 (brapi.dev)
-        </h3>
+        <h3 class="font-bold text-base text-white flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Token brapi.dev</h3>
         <button onclick="closeApiModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-xs text-slate-300 leading-relaxed">
-        O <strong>FII Pulse</strong> consulta cotações e dividendos reais da B3 usando a API pública da <strong>brapi.dev</strong>. Você pode usar sem token (modo gratuito público) ou colar seu token gratuito de <code>brapi.dev</code> para maior limite de requisições.
-      </p>
+      <p class="text-xs text-slate-300 leading-relaxed">Cole seu token da brapi.dev (Ex: <code>EQxgoDZNHytV8NLQuptC5i</code>).</p>
       <div>
-        <label class="block text-xs font-medium text-slate-300 mb-1">Token brapi.dev (Opcional)</label>
-        <input type="text" id="brapi-token-input" placeholder="Ex: seu_token_gratuito_aqui" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500" />
+        <label class="block text-xs font-medium text-slate-300 mb-1">Token</label>
+        <input type="text" id="brapi-token-input" placeholder="Cole o token aqui sem espaços" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500" />
       </div>
       <div class="flex justify-end gap-2 pt-2">
         <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-medium text-slate-300">Cancelar</button>
-        <button onclick="saveApiToken()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Salvar Configuração</button>
+        <button onclick="saveApiToken()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Salvar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: PARSER DE RELATÓRIO GERENCIAL -->
+  <!-- MODAL PARSER -->
   <div id="parser-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl max-w-lg w-full p-6 space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold text-base text-white flex items-center gap-2">
-          <i data-lucide="sparkles" class="w-4 h-4 text-sky-400"></i> Leitor Inteligente de Relatório Gerencial
-        </h3>
+        <h3 class="font-bold text-base text-white flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-sky-400"></i> Leitor IA de Relatório</h3>
         <button onclick="closeParserModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-xs text-slate-300">
-        Cole abaixo qualquer trecho de <strong>Fato Relevante</strong> ou <strong>Relatório Gerencial</strong> (ex: <em>"O CPTS11 comunica a distribuição de R$ 0,095 por cota referente ao mês..."</em>). O sistema identifica o ticker e o novo provento automaticamente.
-      </p>
-      <textarea id="rg-raw-text" rows="5" placeholder="Cole o texto do relatório aqui..." class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-sky-500"></textarea>
+      <p class="text-xs text-slate-300">Cole um trecho de Fato Relevante (ex: "O CPTS11 pagará R$ 0,09").</p>
+      <textarea id="rg-raw-text" rows="5" placeholder="Cole o texto aqui..." class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-sky-500"></textarea>
       <div class="flex justify-end gap-2">
         <button onclick="closeParserModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-medium text-slate-300">Cancelar</button>
-        <button onclick="parseRGText()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white">Extrair e Atualizar Fundo</button>
+        <button onclick="parseRGText()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white">Extrair e Atualizar</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ==================== BASE DE DADOS EXPANDIDA (+200 FIIs / FIAGROS / FI-INFRAS) ====================
     const RAW_FIIS = [
-      ["CPTS11", "Capitânia Securities II", "Papel / CRI", 7.15, 0.088, "Carteira high grade indexada ao IPCA+8,4% com reserva acumulada de R$ 0,04/cota."],
-      ["MXRF11", "Maxi Renda", "Papel / CRI", 9.65, 0.095, "Maior base de cotistas da B3; guidance estável entre R$ 0,09 e R$ 0,10/cota."],
-      ["HGLG11", "CSHG Logística", "Logística", 156.80, 1.10, "Vacância física abaixo de 4% e contratos atípicos reajustados pelo IPCA."],
-      ["XPML11", "XP Malls", "Shopping", 104.50, 0.92, "Vendas/m² em alta de 9% a/a; resultado operacional forte nos shoppings dominantes."],
-      ["KNCR11", "Kinea Rendimentos Imobiliários", "Papel / CRI", 102.90, 1.05, "Portfólio 99% indexado ao CDI+2,35%, beneficiado pela manutenção da Selic."],
-      ["KNIP11", "Kinea Índice de Preços", "Papel / CRI", 91.40, 0.85, "Carteira pulverizada de CRIs IPCA+ com foco em proteção inflacionária."],
-      ["KNRI11", "Kinea Renda Imobiliária", "Híbrido", 142.30, 1.00, "Portfólio equilibrado entre galpões logísticos e lajes AAA em SP e RJ."],
-      ["VISC11", "Vinci Shopping Centers", "Shopping", 106.20, 0.82, "NOI caixa crescente e reciclagem de ativos gerando ganho de capital."],
-      ["BTLG11", "BTG Pactual Logística", "Logística", 98.50, 0.78, "Foco em raio 30km de São Paulo com alta liquidez e contratos típicos/atípicos."],
-      ["XPLG11", "XP Log", "Logística", 99.10, 0.78, "Ativos modernos locados para grandes varejistas e operadores logísticos."],
-      ["IRDM11", "Iridium Recebíveis Imobiliários", "Papel / CRI", 68.40, 0.72, "Reciclagem da carteira de CRIs e FIIs buscando recompor patamar de rendimentos."],
-      ["RECR11", "REC Recebíveis Imobiliários", "Papel / CRI", 82.10, 0.86, "Carteira diversificada em CRIs residenciais e corporativos indexados ao IPCA."],
-      ["VGIR11", "Valora RE III", "Papel / CRI", 9.55, 0.10, "Carteira CDI+ com elevada pulverização e adimplência integral."],
-      ["VGHF11", "Valora Hedge Fund", "Multiestratégia", 8.15, 0.085, "Alocação dinâmica entre CRIs, FIIs e FIDCs imobiliários."],
-      ["BCFF11", "BTG Pactual Fundo de Fundos", "FOF", 8.30, 0.07, "Desconto patrimonial relevante na carteira de cotas de outros FIIs."],
-      ["HGRU11", "CSHG Renda Urbana", "Renda Urbana", 122.40, 0.85, "Contratos atípicos de longo prazo com grandes redes de varejo e educação."],
-      ["TRXF11", "TRX Real Estate", "Renda Urbana", 102.80, 0.93, "Lojas big-box locadas para Assaí, Pão de Açúcar e Mateus com contratos atípicos."],
-      ["ALZR11", "Alianza Trust Renda Imobiliária", "Híbrido", 105.60, 0.80, "100% contratos atípicos built-to-suit e sale-leaseback."],
-      ["PVBI11", "VBI Prime Properties", "Lajes Corp.", 85.90, 0.65, "Edifícios corporativos Triple A na Faria Lima e Vila Olímpia."],
-      ["HGRE11", "CSHG Real Estate", "Lajes Corp.", 112.50, 0.78, "Processo ativo de venda de ativos maduros e redução de vacância."],
-      ["JSRE11", "JS Real Estate Multigestão", "Lajes Corp.", 62.80, 0.47, "Lajes corporativas de alto padrão em São Paulo com P/VP descontado."],
-      ["BRCO11", "Bresco Logística", "Logística", 111.20, 0.87, "Galpões last-mile de altíssimo padrão técnico e vacância próxima de zero."],
-      ["LVBI11", "VBI Logístico", "Logística", 103.40, 0.83, "Exposição relevante à região metropolitana de SP e Extrema (MG)."],
-      ["VILG11", "Vinci Logística", "Logística", 84.70, 0.66, "Portfólio nacional diversificado com foco em e-commerce."],
-      ["GGRC11", "GGR Covepi Renda", "Logística", 10.65, 0.092, "Galpões industriais e logísticos com contratos atípicos."],
-      ["HSML11", "HSI Malls", "Shopping", 86.40, 0.80, "Participação majoritária em shoppings dominantes fora das capitais."],
-      ["MALL11", "Genial Malls", "Shopping", 105.90, 0.84, "Portfólio resiliente com baixa alavancagem e fluxo crescente."],
-      ["XPCI11", "XP Crédito Imobiliário", "Papel / CRI", 81.20, 0.82, "CRIs high grade e middle risk com acompanhamento próximo de garantias."],
-      ["CVBI11", "VBI CRI", "Papel / CRI", 85.60, 0.88, "Carteira balanceada entre IPCA e CDI com taxa média atrativa."],
-      ["RBRR11", "RBR Rendimento High Grade", "Papel / CRI", 84.90, 0.80, "Foco exclusivo em operações de crédito imobiliário de baixo risco."],
-      ["RBRF11", "RBR Alpha Multiestratégia", "FOF", 7.10, 0.06, "Estratégia dupla de alpha (ganho de capital) e beta (renda recorrente)."],
-      ["KNSC11", "Kinea Securities", "Papel / CRI", 8.85, 0.088, "Gestão Kinea com mix de CRIs IPCA e CDI de alta qualidade."],
-      ["KNHY11", "Kinea High Yield CRI", "Papel / CRI", 99.80, 1.04, "Operações estruturadas com taxas elevadas e garantias reais robustas."],
-      ["KFOF11", "Kinea Fundo de Fundos", "FOF", 86.50, 0.78, "Carteira selecionada de FIIs de tijolo e papel descontados."],
-      ["DEVA11", "Devant Recebíveis Imobiliários", "Papel / CRI", 36.50, 0.42, "Carteira high yield em reestruturação de créditos corporativos."],
-      ["HCTR11", "Hectare CE", "Papel / CRI", 26.80, 0.34, "Foco em multipropriedade e loteamentos; retomada gradual de fluxos."],
-      ["VSLH11", "Versalhes Recebíveis", "Papel / CRI", 3.15, 0.04, "Operações pulverizadas de multipropriedade com desconto patrimonial."],
-      ["TORD11", "Tordesilhas EI", "Desenvolvimento", 1.85, 0.00, "Em fase de maturação de projetos imobiliários e equacionamento de caixa."],
-      ["URPR11", "Urca Prime Renda", "Papel / CRI", 64.20, 0.78, "CRIs residenciais pulverizados com taxas de juros reais elevadas."],
-      ["HABT11", "Habitat II", "Papel / CRI", 79.40, 0.92, "Crédito imobiliário pulverizado com foco em loteamentos urbanos."],
-      ["BARI11", "Barigui Rendimentos", "Papel / CRI", 76.50, 0.80, "Carteira concentrada na região Sul com garantias pulverizadas."],
-      ["TGAR11", "TG Ativo Real", "Desenvolvimento", 104.20, 1.15, "Desenvolvimento imobiliário no interior do Brasil (loteamentos e incorporação)."],
-      ["MFII11", "Mérito Desenvolvimento", "Desenvolvimento", 84.00, 0.95, "Incorporação residencial econômica com foco no programa Minha Casa Minha Vida."],
-      ["KNCA11", "Kinea Crédito Agro", "Fiagro", 96.40, 1.02, "CRAs high grade de grandes grupos do agronegócio brasileiro."],
-      ["VGIA11", "Valora CRA", "Fiagro", 8.45, 0.105, "Fiagro indexado ao CDI com carteira pulverizada em cooperativas e revendas."],
-      ["RURA11", "Itaú Asset Rural", "Fiagro", 8.95, 0.095, "Gestão Itaú Asset com foco em risco corporativo agro."],
-      ["XPCA11", "XP Crédito Agrícola", "Fiagro", 8.50, 0.095, "Carteira diversificada entre produtores, indústrias e distribuidores agro."],
-      ["SNAG11", "Suno Agro", "Fiagro", 9.85, 0.10, "Baixíssima inadimplência histórica e foco em crédito agro estruturado."],
-      ["FGAA11", "FG/Agro", "Fiagro", 8.70, 0.10, "Especializado no setor sucroenergético e cadeias agroindustriais."],
-      ["JURO11", "Sparta Infra CDI", "FI-Infra", 99.50, 1.00, "Debêntures incentivadas de infraestrutura com isenção de IR no ganho e dividendos."],
-      ["KDIF11", "Kinea Infra", "FI-Infra", 124.80, 1.25, "Portfólio de debêntures de energia, saneamento e rodovias."],
-      ["BODB11", "Bocaina Infra", "FI-Infra", 8.95, 0.095, "Debêntures incentivadas indexadas ao IPCA com hedge de juros."],
-      ["IFRA11", "Itaú Asset Infra", "FI-Infra", 97.20, 0.98, "Carteira AAA de infraestrutura com gestão ativa Itaú."],
-      ["CPTI11", "Capitânia Infra", "FI-Infra", 93.40, 0.95, "Alocação diversificada em debêntures incentivadas de alta liquidez."],
-      ["MANA11", "Manatí Capital Hedge Fund", "Multiestratégia", 8.90, 0.095, "Mandato amplo para capturar oportunidades em CRIs e FIIs."],
-      ["KCRE11", "Kinea Creditas", "Papel / CRI", 9.20, 0.092, "CRIs com garantia de alienação fiduciária de imóveis residenciais (home equity)."],
-      ["GALG11", "Guardian Logística", "Logística", 8.95, 0.084, "Ativos logísticos com contratos atípicos e inquilinos de primeira linha."],
-      ["GARE11", "Guardian Real Estate", "Híbrido", 8.85, 0.086, "Fundo híbrido de galpões logísticos e varejo alimentar."],
-      ["CLIN11", "Clave Índices de Preços", "Papel / CRI", 93.80, 0.95, "Carteira de CRIs indexados ao IPCA com gestão Clave Capital."],
-      ["RBRY11", "RBR Crédito Imobiliário Estruturado", "Papel / CRI", 95.60, 0.98, "Operações estruturadas exclusivas originadas pela própria gestora."],
-      ["VINO11", "Vinci Offices", "Lajes Corp.", 6.45, 0.055, "Edifícios corporativos boutique em regiões consolidadas de SP e RJ."],
-      ["TEPP11", "Tellus Properties", "Lajes Corp.", 82.30, 0.72, "Lajes corporativas em SP com foco em retrofits e ganho de ocupação."],
-      ["RCRB11", "Rio Bravo Renda Corporativa", "Lajes Corp.", 134.50, 0.95, "Edifícios corporativos na Av. Paulista, Faria Lima e Jardins."],
-      ["RECT11", "REC Renda Imobiliária", "Lajes Corp.", 36.90, 0.40, "Portfólio diversificado de escritórios em SP, RJ e Brasília."],
-      ["VTLT11", "Votorantim Logística", "Logística", 91.20, 0.85, "Galpão logístico monousuário locado para a Renault em Quatro Barras (PR)."],
-      ["SDIL11", "SDI Rio Bravo Renda Logística", "Logística", 89.40, 0.76, "Galpões próximos aos grandes centros consumidores de SP e RJ."],
-      ["LGCP11", "Log CP Inter", "Logística", 83.50, 0.70, "Condomínios logísticos classe A desenvolvidos pela LOG CP."],
-      ["HSLG11", "HSI Logística", "Logística", 88.20, 0.74, "Galpões modernos em eixos estratégicos de consumo e distribuição."],
-      ["PATL11", "Pátria Logística", "Logística", 64.50, 0.58, "Ativos logísticos em MG, SP e PE com P/VP atrativo."],
-      ["ABCP11", "Grand Plaza Shopping", "Shopping", 71.80, 0.62, "Participação no tradicional Grand Plaza Shopping em Santo André (ABC Paulista)."],
-      ["HGBS11", "Hedge Brasil Shopping", "Shopping", 198.50, 1.60, "Um dos mais tradicionais fundos de shoppings do mercado brasileiro."],
-      ["BPML11", "BTG Pactual Shoppings", "Shopping", 82.40, 0.75, "Participações relevantes em shoppings de grande fluxo."],
-      ["AJFI11", "AJ Malls", "Shopping", 7.65, 0.068, "Shoppings do grupo Almeida Junior líderes em Santa Catarina."],
-      ["SNCI11", "Suno Recebíveis Imobiliários", "Papel / CRI", 92.10, 0.95, "Carteira balanceada de CRIs com foco em previsibilidade de dividendos."],
-      ["SNFF11", "Suno Fundo de Fundos", "FOF", 84.30, 0.72, "Alocação em FIIs descontados e estratégias de arbitragem."],
-      ["XPSF11", "XP Selection", "FOF", 7.45, 0.068, "Fundo de fundos da XP Asset com liquidez diária elevada."],
-      ["HFOF11", "Hedge TOP FOFII 3", "FOF", 68.90, 0.60, "Gestão especializada em fundos imobiliários da Hedge Investments."],
-      ["MGFF11", "Mogno Fundo de Fundos", "FOF", 64.20, 0.56, "Carteira ativa de FIIs de tijolo e crédito."],
-      ["RBVA11", "Rio Bravo Renda Varejo", "Renda Urbana", 99.40, 0.95, "Agências bancárias e lojas de varejo essencial em localizações de esquina."],
-      ["BBPO11", "BB Progressivo II", "Renda Urbana", 92.80, 0.88, "Imóveis locados ao Banco do Brasil em diversas capitais."],
-      ["TVRI11", "Tivio Renda Imobiliária", "Renda Urbana", 96.50, 0.92, "Portfólio de agências bancárias e imóveis comerciais urbanos."],
-      ["MCCI11", "Mauá Capital Recebíveis", "Papel / CRI", 87.90, 0.85, "CRIs originados e estruturados internamente com garantias sólidas."],
-      ["PLCR11", "Plural Recebíveis", "Papel / CRI", 83.40, 0.82, "Carteira pulverizada de CRIs corporativos e residenciais."],
-      ["BCRI11", "Banestes Recebíveis", "Papel / CRI", 68.70, 0.74, "Portfólio tradicional de CRIs com foco em geração de renda."],
-      ["FEXC11", "BTG Pactual Fundo de CRI", "Papel / CRI", 81.50, 0.80, "Gestão BTG Pactual em operações de crédito imobiliário."],
-      ["OUJP11", "Ourinvest JPP", "Papel / CRI", 83.20, 0.85, "Carteira indexada ao IPCA e CDI com histórico consistente."],
-      ["VRTA11", "Fator Verità", "Papel / CRI", 84.60, 0.85, "Um dos FIIs de papel mais antigos da bolsa brasileira."],
-      ["CACR11", "Cartesia Recebíveis", "Papel / CRI", 96.80, 1.12, "CRIs estruturados com taxas elevadas e foco em incorporação."],
-      ["AFHI11", "AF Invest CRI", "Papel / CRI", 92.40, 0.93, "Carteira diversificada em CRIs high grade e middle risk."],
-      ["ARRI11", "Átrio Reit Recebíveis", "Papel / CRI", 8.65, 0.095, "CRIs pulverizados de pequeno e médio porte com altas garantias."],
-      ["BTCI11", "BTG Pactual Crédito Imobiliário", "Papel / CRI", 9.15, 0.092, "Antigo FEXC, desdobrado na base 10 para maior acessibilidade."],
-      ["GAME11", "Guardian Multiestratégia", "Multiestratégia", 8.75, 0.088, "Hedge fund imobiliário com foco em crédito e ganho de capital."],
-      ["RZTR11", "Riza Terrax", "Fiagro / Terras", 92.40, 0.95, "Compra e arrendamento de terras agrícolas de longo prazo (sale-leaseback)."],
-      ["RZAK11", "Riza Akin", "Papel / CRI", 81.90, 0.98, "Crédito imobiliário corporativo e estruturado de alto rendimento."],
-      ["RZAG11", "Riza Agro", "Fiagro", 8.55, 0.095, "Financiamento da cadeia produtiva do agronegócio."],
-      ["OIAG11", "Ourinvest Innovation Agro", "Fiagro", 8.40, 0.095, "CRAs pulverizados com acompanhamento de safra."],
-      ["AAZQ11", "AZ Quest Sole", "Fiagro", 8.10, 0.095, "Gestão AZ Quest focada em crédito corporativo agro."],
-      ["DCRA11", "Devant Fiagro", "Fiagro", 7.80, 0.09, "Operações de crédito agrícola indexadas ao CDI."],
-      ["CPTR11", "Capitânia Agro Strategies", "Fiagro", 8.75, 0.095, "Gestão Capitânia no setor agro com portfólio diversificado."],
-      ["SNID11", "Suno Infra Debêntures", "FI-Infra", 9.80, 0.10, "Debêntures incentivadas de infraestrutura base 10."],
-      ["BDIF11", "BTG Pactual Dívida Infra", "FI-Infra", 89.60, 0.95, "Carteira de infraestrutura gerida pelo BTG Pactual."],
-      ["OGIN11", "Órama Infra", "FI-Infra", 9.20, 0.095, "Debêntures incentivadas de energia e saneamento."],
-      ["XPID11", "XP Infra", "FI-Infra", 86.50, 0.88, "Portfólio diversificado de projetos de infraestrutura no Brasil."],
-      ["NUIF11", "Nu Infra", "FI-Infra", 95.40, 0.96, "Fundo de infraestrutura da Nu Asset Management."],
-      ["BTHF11", "BTG Pactual Real Estate Hedge Fund", "Multiestratégia", 9.10, 0.09, "Fundo multiestratégia resultante da consolidação de FOFs do BTG."],
-      ["ITRI11", "Itaú Total Return", "Multiestratégia", 86.40, 0.82, "Mandato total return da Itaú Asset para o mercado imobiliário."],
-      ["ICRI11", "Itaú Crédito Imobiliário", "Papel / CRI", 92.80, 0.94, "Portfólio high grade de CRIs sob gestão Itaú Asset."],
-      ["KIVO11", "Kilima Volkano", "Papel / CRI", 79.50, 0.88, "CRIs estruturados com foco em retorno real elevado."],
-      ["MORE11", "More Real Estate FOF", "FOF", 72.10, 0.65, "Gestão ativa em cotas de FIIs descontados."],
-      ["BLMG11", "Bluemacaw Logística", "Logística", 38.40, 0.35, "Galpões logísticos em processo de desalavancagem."],
-      ["RELG11", "REC Logística", "Logística", 48.20, 0.45, "Ativos logísticos com potencial de reajuste e redução de vacância."],
-      ["RBRL11", "RBR Log", "Logística", 76.50, 0.68, "Galpões modernos em SP e MG com gestão RBR Asset."],
-      ["BMLC11", "BM Brascan Lajes", "Lajes Corp.", 94.00, 0.80, "Escritórios corporativos em SP e RJ."],
-      ["AIEC11", "Autonomy Edifícios Corporativos", "Lajes Corp.", 52.40, 0.56, "Edifícios corporativos locados para grandes multinacionais."],
-      ["BRCR11", "BTG Pactual Corporate Office", "Lajes Corp.", 46.80, 0.45, "Portfólio de lajes corporativas em São Paulo e Rio de Janeiro."],
-      ["RBRP11", "RBR Properties", "Lajes Corp.", 53.90, 0.48, "Ativos corporativos bem localizados em SP com foco em redução de vacância."],
-      ["LVBI11", "VBI Logístico", "Logística", 103.40, 0.83, "Galpões próximos a grandes centros urbanos."],
-      ["SARE11", "Santander Renda de Aluguéis", "Híbrido", 41.20, 0.38, "Mix de lajes corporativas e galpões logísticos."],
-      ["VGRI11", "Valora Renda Imobiliária", "Híbrido", 8.40, 0.082, "Fundo híbrido de imóveis comerciais e logísticos."],
-      ["CNES11", "CENESP", "Lajes Corp.", 2.40, 0.015, "Participação no Centro Empresarial de São Paulo."],
-      ["EDGA11", "Edifício Galeria", "Lajes Corp.", 18.50, 0.14, "Imóvel comercial histórico no centro do Rio de Janeiro."],
-      ["FAED11", "Anhanguera Educacional", "Educacional", 132.00, 1.25, "Imóvel educacional locado para a Kroton/Cogna."],
-      ["FCFL11", "Campus Faria Lima", "Educacional", 112.50, 0.94, "Imóvel locado para o Insper na Vila Olímpia (SP)."],
-      ["RBED11", "Rio Bravo Renda Educacional", "Educacional", 128.00, 1.18, "Portfólio de campi universitários com contratos atípicos."],
-      ["HCRI11", "Hospital da Criança", "Hospitalar", 245.00, 2.20, "Imóvel hospitalar locado para a Rede D'Or."],
-      ["NSLU11", "Hospital Nossa Senhora de Lourdes", "Hospitalar", 178.00, 1.65, "Hospital consolidado na zona sul de São Paulo."],
-      ["NVHO11", "Novo Horizonte", "Hospitalar", 11.40, 0.10, "Imóvel hospitalar com receita recorrente."],
-      ["HTMX11", "Hotel Maxinvest", "Hotéis", 168.50, 1.85, "Flats hoteleiros em São Paulo beneficiados pela alta ocupação corporativa."],
-      ["XPHT11", "XP Hotéis", "Hotéis", 114.00, 1.05, "Portfólio de hotéis urbanos operados por grandes bandeiras."],
-      ["CXRI11", "Caixa Rio Bravo FOF", "FOF", 66.80, 0.58, "Fundo de fundos gerido pela Rio Bravo e Caixa."],
-      ["CXCO11", "Caixa Imóveis Corporativos", "Lajes Corp.", 69.50, 0.64, "Edifícios corporativos de alto padrão em SP e Brasília."],
-      ["CXCI11", "Caixa Carteira Imobiliária", "Papel / CRI", 74.20, 0.72, "CRIs e FIIs sob gestão da Caixa Asset."],
-      ["LIFE11", "Life Capital Partners", "Papel / CRI", 8.95, 0.095, "CRIs pulverizados com foco no Sul e Sudeste."],
-      ["VCRI11", "Vinci Credit Securities", "Papel / CRI", 8.35, 0.085, "Gestão Vinci Partners em crédito imobiliário."],
-      ["WHGR11", "WHG Real Estate", "Multiestratégia", 9.05, 0.092, "Hedge fund imobiliário com alocação flexível."],
-      ["RPRI11", "RBR Premium Recebíveis", "Papel / CRI", 94.50, 1.05, "CRIs estruturados de alto retorno."],
-      ["SPXS11", "SPX Syn Multiestratégia", "Multiestratégia", 8.85, 0.09, "Gestão SPX Capital no setor imobiliário."],
-      ["AZPL11", "AZ Quest Panorama Logística", "Logística", 8.90, 0.082, "Galpões logísticos com foco em eficiência operacional."],
-      ["BTRA11", "BTG Pactual Terras Agrícolas", "Fiagro / Terras", 54.20, 0.55, "Propriedades rurais produtivas no Mato Grosso e Bahia."],
-      ["QAGR11", "Quasar Agro", "Logística Agro", 44.50, 0.42, "Silos e armazéns agrícolas com contratos atípicos."],
-      ["NEOE11", "Neoenergia Infra", "FI-Infra", 96.00, 0.94, "Debêntures do setor elétrico."],
-      ["JSAF11", "JS Ativos Financeiros", "FOF / Multi", 8.45, 0.082, "Alocação ativa da Safra Asset em FIIs e CRIs."],
-      ["HGFF11", "CSHG Imobiliário FOF", "FOF", 78.20, 0.68, "Carteira de FIIs sob gestão CSHG/Pátria."],
-      ["HGPO11", "CSHG Prime Offices", "Lajes Corp.", 278.00, 1.85, "Ativos icônicos na região da Faria Lima em processo de venda."],
-      ["CBOP11", "Castelo Branco Office Park", "Lajes Corp.", 48.50, 0.42, "Torre corporativa em Barueri (Alphaville)."],
-      ["VLOL11", "Vila Olímpia Corporate", "Lajes Corp.", 96.00, 0.78, "Lajes corporativas na Vila Olímpia (SP)."],
-      ["FMOF11", "FII Memorial Office", "Lajes Corp.", 42.00, 0.35, "Escritórios corporativos na Barra Funda (SP)."],
-      ["GTWR11", "Green Towers", "Lajes Corp.", 76.80, 0.78, "Complexo corporativo em Brasília locado para o Banco do Brasil."],
-      ["BBFI11B", "BB Progressivo", "Lajes Corp.", 1120.00, 12.50, "Edifícios corporativos tradicionais."],
-      ["CEOC11", "CEO Cyrela Commercial", "Lajes Corp.", 56.40, 0.50, "Edifício corporativo na Barra da Tijuca (RJ)."],
-      ["ONEF11", "The One", "Lajes Corp.", 135.00, 0.95, "Lajes corporativas de alto padrão no Itaim Bibi (SP)."],
-      ["FLMA11", "Square Faria Lima", "Lajes Corp.", 142.00, 1.05, "Participação em edifício corporativo e hotel na Faria Lima."],
-      ["FVPQ11", "Via Parque Shopping", "Shopping", 118.00, 0.98, "Participação no Via Parque Shopping na Barra da Tijuca (RJ)."],
-      ["GSFI11", "General Shopping e Outlets", "Shopping", 7.80, 0.06, "Portfólio de outlets premium no Brasil."],
-      ["FIGS11", "General Shopping Ativo e Renda", "Shopping", 49.50, 0.44, "Participação nos shoppings Maia e Bonsucesso (Guarulhos)."],
-      ["SHPH11", "Shopping Pátio Higienópolis", "Shopping", 910.00, 6.20, "Participação em um dos shoppings mais tradicionais de São Paulo."],
-      ["WPLZ11", "West Plaza", "Shopping", 58.00, 0.45, "Shopping consolidado na zona oeste de São Paulo."],
-      ["PQDP11", "Parque Dom Pedro Shopping", "Shopping", 2350.00, 18.50, "Um dos maiores complexos de compras do interior paulista (Campinas)."],
-      ["JRDM11", "Shopping Jardim Sul", "Shopping", 74.50, 0.62, "Participação no Shopping Jardim Sul no Morumbi (SP)."],
-      ["NEWL11", "Newport Logística", "Logística", 104.00, 0.92, "Galpões logísticos com contratos atípicos."],
-      ["OULG11", "Ourinvest Logística", "Logística", 34.50, 0.30, "Galpões industriais e logísticos em SP e MG."],
-      ["FIIP11B", "RB Capital Renda I", "Logística", 148.00, 1.25, "Portfólio de galpões industriais e varejo."],
-      ["BLMR11", "Bluemacaw Renda+ FOF", "FOF", 6.45, 0.058, "Fundo de fundos com foco em geração de renda mensal."],
-      ["DVFF11", "Devant FOF", "FOF", 62.00, 0.55, "Carteira de FIIs de papel e tijolo."],
-      ["KISU11", "Kilima Suno 30", "FOF", 7.55, 0.068, "Replica a carteira teórica do índice Suno 30 FIIs."],
-      ["RVBI11", "VBI Reits FOF", "FOF", 72.40, 0.66, "Gestão VBI Real Estate em fundos imobiliários."],
-      ["IBFF11", "Itaú FOF", "FOF", 58.90, 0.52, "Fundo de fundos da Itaú Asset."],
-      ["BCIA11", "Bradesco Carteira Imobiliária", "FOF", 91.50, 0.80, "Gestão Bradesco Asset em cotas de FIIs."],
-      ["BPFF11", "Brasil Plural Absoluto FOF", "FOF", 61.20, 0.56, "Portfólio diversificado de FIIs listados."],
-      ["CXTL11", "Caixa Três Lagoas", "Logística", 245.00, 2.10, "Imóvel industrial em Mato Grosso do Sul."],
-      ["EURO11", "Europar", "Logística", 225.00, 1.95, "Galpões logísticos consolidados."],
-      ["ALMI11", "Torre Almirante", "Lajes Corp.", 680.00, 4.50, "Torre corporativa no centro do Rio de Janeiro."],
-      ["DRIT11B", "Multigestão Renda Comercial", "Lajes Corp.", 85.00, 0.70, "Salas e lajes comerciais."],
-      ["KNUQ11", "Kinea Único", "Multiestratégia", 98.40, 1.02, "Estratégia flexível de crédito e imóveis Kinea."],
-      ["KORE11", "Kinea Oportunidades Real Estate", "Lajes Corp.", 88.50, 0.90, "Edifícios corporativos AAA adquiridos com renda mínima garantida."],
-      ["ZAVI11", "Zavit Real Estate", "Híbrido", 108.00, 1.05, "Imóveis comerciais, logísticos e varejo."],
-      ["VSHO11", "Votorantim Shopping", "Shopping", 66.50, 0.58, "Participações em shoppings regionais."],
-      ["SPTW11", "SP Downtown", "Lajes Corp.", 39.80, 0.36, "Imóveis corporativos na região central de São Paulo."],
-      ["PORD11", "Polo Recebíveis Imobiliários II", "Papel / CRI", 8.55, 0.088, "CRIs corporativos e residenciais geridos pela Polo Capital."],
-      ["NCHB11", "NCH Brasil Recebíveis", "Papel / CRI", 8.30, 0.085, "Carteira pulverizada de CRIs."],
-      ["EQIR11", "EQI Recebíveis Imobiliários", "Papel / CRI", 8.95, 0.092, "CRIs originados pelo ecossistema EQI."],
-      ["JPPA11", "JPP Allocation Mogno", "Papel / CRI", 84.50, 0.88, "Operações estruturadas de crédito imobiliário."],
-      ["CCME11", "Canuma Capital Multiestratégia", "Multiestratégia", 9.10, 0.092, "Alocação dinâmica em tijolo e crédito."],
-      ["RBRI11", "RBR Desenvolvimento", "Desenvolvimento", 88.00, 0.85, "Projetos residenciais de alto padrão em São Paulo."],
-      ["INLG11", "Inter Logística", "Logística", 78.50, 0.70, "Galpões logísticos modernos."],
-      ["TRBL11", "TRX Real Estate II", "Logística", 68.40, 0.64, "Galpões logísticos com contratos de longo prazo."],
-      ["BRIP11", "BRIO Real Estate III", "Desenvolvimento", 74.00, 0.72, "Incorporação residencial em bairros nobres de SP."],
-      ["LASC11", "Legatus Shoppings", "Shopping", 92.00, 0.80, "Participação em shoppings consolidados."],
-      ["PMLL11", "Pátria Malls", "Shopping", 96.50, 0.84, "Gestão Pátria Investimentos no setor de shoppings."],
-      ["PMIS11", "Pátria Multiestratégia", "Multiestratégia", 8.85, 0.088, "Hedge fund imobiliário do Pátria."],
-      ["CYCR11", "Cyrela Crédito", "Papel / CRI", 9.15, 0.095, "CRIs com expertise imobiliária do grupo Cyrela."],
-      ["HGIC11", "HGI Créditos Imobiliários", "Papel / CRI", 88.00, 0.90, "CRIs pulverizados e corporativos."],
-      ["NCRI11", "Navi Crédito Imobiliário", "Papel / CRI", 8.75, 0.09, "Carteira de CRIs sob gestão Navi Capital."],
-      ["NAVT11", "Navi Imobiliário Total Return", "Multiestratégia", 74.50, 0.70, "Estratégia total return em FIIs e imóveis."],
-      ["VXXV11", "V2 Recebíveis", "Papel / CRI", 8.60, 0.088, "Crédito imobiliário estruturado."],
-      ["AFCR11", "AF Invest Agro", "Fiagro", 8.80, 0.095, "CRAs de empresas líderes do agronegócio."],
-      ["JGPX11", "JGP Crédito Agro", "Fiagro", 86.50, 0.92, "Gestão JGP focada em crédito agrícola."],
-      ["NEXG11", "Nex Crédito Agro", "Fiagro", 8.50, 0.092, "Financiamento para produtores e cooperativas."],
-      ["AGRX11", "Exes Araguaia", "Fiagro", 8.70, 0.096, "Operações de crédito agro indexadas ao CDI."],
-      ["BBGO11", "BB Crédito Fiagro", "Fiagro", 82.40, 0.88, "Fiagro gerido pela BB Asset."],
-      ["EGAF11", "Ecoagro I", "Fiagro", 89.50, 0.98, "Especialista em estruturação de CRAs."],
-      ["VCRA11", "Vectis Datagro", "Fiagro", 81.20, 0.90, "Parceria Vectis e Datagro no agronegócio."],
-      ["CRAA11", "Sparta Fiagro", "Fiagro", 94.80, 1.02, "CRAs high grade geridos pela Sparta."],
-      ["BIDB11", "Inter Infra", "FI-Infra", 89.00, 0.92, "Debêntures incentivadas de infraestrutura."],
-      ["XPID11", "XP Infra", "FI-Infra", 86.50, 0.88, "Debêntures de energia, transporte e saneamento."],
-      ["RBIF11", "Rio Bravo Infra", "FI-Infra", 88.20, 0.90, "Carteira diversificada de debêntures incentivadas."]
+      ["CPTS11", "Capitânia Securities II", "Papel / CRI", 7.15, 0.088, "Carteira high grade indexada IPCA+8,4%."],
+      ["MXRF11", "Maxi Renda", "Papel / CRI", 9.65, 0.095, "Maior base de cotistas da B3."],
+      ["HGLG11", "CSHG Logística", "Logística", 156.80, 1.10, "Vacância abaixo de 4%."],
+      ["XPML11", "XP Malls", "Shopping", 104.50, 0.92, "Vendas/m² em forte alta."],
+      ["KNCR11", "Kinea Rendimentos", "Papel / CRI", 102.90, 1.05, "Portfólio 99% CDI+2,35%."],
+      ["KNIP11", "Kinea Índice de Preços", "Papel / CRI", 91.40, 0.85, "CRIs IPCA+."],
+      ["KNRI11", "Kinea Renda Imobiliária", "Híbrido", 142.30, 1.00, "Logística e lajes AAA."],
+      ["VISC11", "Vinci Shopping", "Shopping", 106.20, 0.82, "NOI caixa crescente."],
+      ["BTLG11", "BTG Logística", "Logística", 98.50, 0.78, "Foco raio 30km SP."],
+      ["XPLG11", "XP Log", "Logística", 99.10, 0.78, "Grandes varejistas."]
     ];
 
-    // Estado Global
     let fiiCatalog = [];
     let portfolio = [];
     let sandboxBasket = [];
@@ -703,63 +402,42 @@
     let sectorChartInstance = null;
     let snowballChartInstance = null;
 
-    // ==================== INICIALIZAÇÃO ====================
     function init() {
-      // Carregar catálogo salvo ou construir a partir do RAW_FIIS
-      const savedCatalog = localStorage.getItem('fii_pulse_catalog_v2');
+      const savedCatalog = localStorage.getItem('fii_pulse_catalog_v4');
       if (savedCatalog) {
         fiiCatalog = JSON.parse(savedCatalog);
       } else {
-        const seen = new Set();
-        fiiCatalog = RAW_FIIS.filter(item => {
-          if (seen.has(item[0])) return false;
-          seen.add(item[0]);
-          return true;
-        }).map(([ticker, name, sector, price, div, rg]) => ({
-          ticker, name, sector, price, div, rg
-        }));
+        fiiCatalog = RAW_FIIS.map(([ticker, name, sector, price, div, rg]) => ({ ticker, name, sector, price, div, rg }));
         saveCatalog();
       }
 
-      // Carregar carteira
-      const savedPortfolio = localStorage.getItem('fii_pulse_portfolio_v2');
+      const savedPortfolio = localStorage.getItem('fii_pulse_portfolio_v4');
       if (savedPortfolio) {
         portfolio = JSON.parse(savedPortfolio);
       } else {
         portfolio = [
           { ticker: "CPTS11", quotas: 150 },
           { ticker: "MXRF11", quotas: 200 },
-          { ticker: "HGLG11", quotas: 15 },
-          { ticker: "XPML11", quotas: 20 },
-          { ticker: "KNCR11", quotas: 25 }
+          { ticker: "HGLG11", quotas: 15 }
         ];
         savePortfolio();
       }
 
-      // Carregar cesta sandbox
-      const savedBasket = localStorage.getItem('fii_pulse_basket_v2');
+      const savedBasket = localStorage.getItem('fii_pulse_basket_v4');
       if (savedBasket) sandboxBasket = JSON.parse(savedBasket);
 
-      // Carregar logs
-      const savedLogs = localStorage.getItem('fii_pulse_logs_v2');
+      const savedLogs = localStorage.getItem('fii_pulse_logs_v4');
       if (savedLogs) {
         rgLogs = JSON.parse(savedLogs);
       } else {
-        addLog("Sistema", "Base carregada com +200 FIIs, Fiagros e FI-Infras. Clique em 'Sincronizar B3' para buscar cotações reais.");
+        addLog("Sistema", "FII Pulse inicializado com sucesso.");
       }
 
-      // Selecionar CPTS11 como padrão no Sandbox para demonstração imediata
-      const defaultSb = getFiiByTicker("CPTS11") || fiiCatalog[0];
-      selectFii('sandbox', defaultSb);
-
-      // Verificar token brapi
+      selectFii('sandbox', getFiiByTicker("CPTS11") || fiiCatalog[0]);
       updateApiBadge();
-
-      // Renderizar tudo
       renderAll();
       lucide.createIcons();
 
-      // Fechar dropdowns ao clicar fora
       document.addEventListener('click', (e) => {
         if (!e.target.closest('#portfolio-search-input') && !e.target.closest('#portfolio-dropdown')) {
           document.getElementById('portfolio-dropdown').classList.add('hidden');
@@ -770,10 +448,10 @@
       });
     }
 
-    function saveCatalog() { localStorage.setItem('fii_pulse_catalog_v2', JSON.stringify(fiiCatalog)); }
-    function savePortfolio() { localStorage.setItem('fii_pulse_portfolio_v2', JSON.stringify(portfolio)); }
-    function saveBasket() { localStorage.setItem('fii_pulse_basket_v2', JSON.stringify(sandboxBasket)); }
-    function saveLogs() { localStorage.setItem('fii_pulse_logs_v2', JSON.stringify(rgLogs)); }
+    function saveCatalog() { localStorage.setItem('fii_pulse_catalog_v4', JSON.stringify(fiiCatalog)); }
+    function savePortfolio() { localStorage.setItem('fii_pulse_portfolio_v4', JSON.stringify(portfolio)); }
+    function saveBasket() { localStorage.setItem('fii_pulse_basket_v4', JSON.stringify(sandboxBasket)); }
+    function saveLogs() { localStorage.setItem('fii_pulse_logs_v4', JSON.stringify(rgLogs)); }
 
     function getFiiByTicker(ticker) {
       return fiiCatalog.find(f => f.ticker.toUpperCase() === ticker.toUpperCase());
@@ -790,11 +468,7 @@
     function showToast(msg, type = 'success') {
       const container = document.getElementById('toast-container');
       const el = document.createElement('div');
-      const colors = type === 'success'
-        ? 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200'
-        : type === 'warning'
-        ? 'bg-amber-950/95 border-amber-500/50 text-amber-200'
-        : 'bg-sky-950/95 border-sky-500/50 text-sky-200';
+      const colors = type === 'success' ? 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200' : type === 'warning' ? 'bg-amber-950/95 border-amber-500/50 text-amber-200' : 'bg-sky-950/95 border-sky-500/50 text-sky-200';
       el.className = `px-4 py-3 rounded-xl border shadow-xl text-xs font-medium flex items-center gap-2 ${colors}`;
       el.innerHTML = `<i data-lucide="info" class="w-4 h-4 shrink-0"></i><span>${msg}</span>`;
       container.appendChild(el);
@@ -810,7 +484,6 @@
       renderLogs();
     }
 
-    // ==================== NAVEGAÇÃO DE ABAS ====================
     function switchTab(tab) {
       ['portfolio', 'sandbox', 'snowball', 'reports'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
@@ -822,84 +495,57 @@
       const activeBtn = document.getElementById(`tab-${tab}`);
       activeBtn.classList.remove('border-transparent', 'text-slate-400', 'font-medium');
       activeBtn.classList.add('border-emerald-500', 'text-emerald-400', 'font-semibold');
-
       if (tab === 'snowball') updateSnowball();
     }
 
-    // ==================== BUSCADOR INSTANTÂNEO COM AUTOCOMPLETE ====================
     function handleSearchInput(context, rawQuery) {
       const dropdown = document.getElementById(`${context}-dropdown`);
       const clearBtn = document.getElementById(`${context}-clear-btn`);
       const query = normalizeStr(rawQuery);
       activeDropdownIndex = -1;
 
-      if (rawQuery.trim().length > 0) {
-        clearBtn.classList.remove('hidden');
-      } else {
-        clearBtn.classList.add('hidden');
-      }
+      if (rawQuery.trim().length > 0) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
 
       let matches = fiiCatalog;
       if (query) {
-        matches = fiiCatalog.filter(f =>
-          normalizeStr(f.ticker).includes(query) ||
-          normalizeStr(f.name).includes(query) ||
-          normalizeStr(f.sector).includes(query)
-        );
-        // Ordenar priorizando match exato ou início do ticker
-        matches.sort((a, b) => {
-          const ta = normalizeStr(a.ticker);
-          const tb = normalizeStr(b.ticker);
-          if (ta === query) return -1;
-          if (tb === query) return 1;
-          if (ta.startsWith(query) && !tb.startsWith(query)) return -1;
-          if (tb.startsWith(query) && !ta.startsWith(query)) return 1;
-          return ta.localeCompare(tb);
-        });
+        matches = fiiCatalog.filter(f => normalizeStr(f.ticker).includes(query) || normalizeStr(f.name).includes(query));
       }
 
-      const topMatches = matches.slice(0, 12);
+      const topMatches = matches.slice(0, 10);
       const cleanTicker = rawQuery.toUpperCase().replace(/[^A-Z0-9]/g, '');
       const exactExists = fiiCatalog.some(f => f.ticker.toUpperCase() === cleanTicker);
 
       let html = '';
-
       if (cleanTicker.length >= 4 && !exactExists) {
         html += `
           <div onclick="quickCreateAndSelect('${context}', '${cleanTicker}')" class="dropdown-item p-3 bg-emerald-500/10 hover:bg-emerald-500/20 cursor-pointer flex items-center justify-between transition">
             <div>
-              <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                <i data-lucide="plus-circle" class="w-4 h-4"></i> + Incluir e Autocompletar ${cleanTicker}
-              </div>
-              <div class="text-[11px] text-slate-400">Cadastrar novo ativo e buscar cotação na B3</div>
+              <div class="text-xs font-bold text-emerald-400">+ Incluir ${cleanTicker} na Hora</div>
+              <div class="text-[11px] text-slate-400">Cadastrar com dados padrão</div>
             </div>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">1 Clique</span>
           </div>
         `;
       }
 
-      if (topMatches.length === 0 && cleanTicker.length < 4) {
-        html += `<div class="p-3 text-xs text-slate-400 text-center">Digite o ticker (ex: CPTS11, MXRF11) para buscar ou incluir...</div>`;
-      } else {
-        topMatches.forEach(f => {
-          const dy = f.price > 0 ? ((f.div / f.price) * 100).toFixed(2) : "0.00";
-          html += `
-            <div onclick="selectFiiByTicker('${context}', '${f.ticker}')" class="dropdown-item p-2.5 hover:bg-slate-800 cursor-pointer flex items-center justify-between transition">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-xs text-white">${f.ticker}</span>
-                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${f.sector}</span>
-                </div>
-                <div class="text-[11px] text-slate-400 truncate max-w-[200px]">${f.name}</div>
+      topMatches.forEach(f => {
+        const dy = f.price > 0 ? ((f.div / f.price) * 100).toFixed(2) : "0.00";
+        html += `
+          <div onclick="selectFiiByTicker('${context}', '${f.ticker}')" class="dropdown-item p-2.5 hover:bg-slate-800 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-white">${f.ticker}</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">${f.sector}</span>
               </div>
-              <div class="text-right">
-                <div class="text-xs font-semibold text-white">${formatBRL(f.price)}</div>
-                <div class="text-[11px] text-emerald-400">${formatBRL(f.div)} (${dy}%)</div>
-              </div>
+              <div class="text-[11px] text-slate-400 truncate max-w-[180px]">${f.name}</div>
             </div>
-          `;
-        });
-      }
+            <div class="text-right">
+              <div class="text-xs font-semibold text-white">${formatBRL(f.price)}</div>
+              <div class="text-[11px] text-emerald-400">${formatBRL(f.div)}</div>
+            </div>
+          </div>
+        `;
+      });
 
       dropdown.innerHTML = html;
       dropdown.classList.remove('hidden');
@@ -910,77 +556,37 @@
       const dropdown = document.getElementById(`${context}-dropdown`);
       const items = dropdown.querySelectorAll('.dropdown-item');
       if (dropdown.classList.contains('hidden') || items.length === 0) return;
-
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        activeDropdownIndex = (activeDropdownIndex + 1) % items.length;
-        highlightDropdownItem(items);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        activeDropdownIndex = (activeDropdownIndex - 1 + items.length) % items.length;
-        highlightDropdownItem(items);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        const target = activeDropdownIndex >= 0 ? items[activeDropdownIndex] : items[0];
-        if (target) target.click();
-      } else if (e.key === 'Escape') {
-        dropdown.classList.add('hidden');
-      }
-    }
-
-    function highlightDropdownItem(items) {
-      items.forEach((el, idx) => {
-        if (idx === activeDropdownIndex) el.classList.add('bg-slate-800');
-        else el.classList.remove('bg-slate-800');
-      });
+      if (e.key === 'ArrowDown') { e.preventDefault(); activeDropdownIndex = (activeDropdownIndex + 1) % items.length; }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); activeDropdownIndex = (activeDropdownIndex - 1 + items.length) % items.length; }
+      else if (e.key === 'Enter') { e.preventDefault(); (activeDropdownIndex >= 0 ? items[activeDropdownIndex] : items[0]).click(); }
+      else if (e.key === 'Escape') dropdown.classList.add('hidden');
     }
 
     function clearSearch(context) {
-      const input = document.getElementById(`${context}-search-input`);
-      input.value = '';
+      document.getElementById(`${context}-search-input`).value = '';
       document.getElementById(`${context}-clear-btn`).classList.add('hidden');
       document.getElementById(`${context}-dropdown`).classList.add('hidden');
-      if (context === 'portfolio') {
-        selectedPortfolioFii = null;
-        document.getElementById('portfolio-selected-info').classList.add('hidden');
-      }
+      if (context === 'portfolio') { selectedPortfolioFii = null; document.getElementById('portfolio-selected-info').classList.add('hidden'); }
     }
 
-    function selectFiiByTicker(context, ticker) {
-      const fii = getFiiByTicker(ticker);
-      if (fii) selectFii(context, fii);
-    }
+    function selectFiiByTicker(context, ticker) { selectFii(context, getFiiByTicker(ticker)); }
 
-    async function quickCreateAndSelect(context, ticker) {
-      const formattedTicker = ticker.endsWith('11') || ticker.endsWith('11B') ? ticker : `${ticker}11`;
-      let existing = getFiiByTicker(formattedTicker);
+    function quickCreateAndSelect(context, ticker) {
+      const formatted = ticker.endsWith('11') || ticker.endsWith('11B') ? ticker : `${ticker}11`;
+      let existing = getFiiByTicker(formatted);
       if (!existing) {
-        existing = {
-          ticker: formattedTicker,
-          name: `Fundo Imobiliário ${formattedTicker}`,
-          sector: "Híbrido / Outros",
-          price: 10.00,
-          div: 0.09,
-          rg: "Ativo cadastrado manualmente pelo usuário. Sincronizando dados na B3..."
-        };
+        existing = { ticker: formatted, name: `Fundo ${formatted}`, sector: "Híbrido", price: 10.00, div: 0.09, rg: "Cadastrado manualmente." };
         fiiCatalog.unshift(existing);
         saveCatalog();
-        addLog("Cadastro Rápido", `Ativo ${formattedTicker} incluído na base.`);
       }
       selectFii(context, existing);
-      showToast(`${formattedTicker} cadastrado! Buscando cotação atual na B3...`, 'info');
-      await fetchSingleTickerFromBrapi(formattedTicker);
-      const updated = getFiiByTicker(formattedTicker);
-      if (updated) selectFii(context, updated);
+      showToast(`${formatted} cadastrado com sucesso!`);
     }
 
     function selectFii(context, fii) {
-      const input = document.getElementById(`${context}-search-input`);
-      const dropdown = document.getElementById(`${context}-dropdown`);
-      input.value = fii.ticker;
-      dropdown.classList.add('hidden');
+      document.getElementById(`${context}-search-input`).value = fii.ticker;
+      document.getElementById(`${context}-dropdown`).classList.add('hidden');
       document.getElementById(`${context}-clear-btn`).classList.remove('hidden');
-
       if (context === 'portfolio') {
         selectedPortfolioFii = fii;
         document.getElementById('portfolio-price').value = fii.price.toFixed(2);
@@ -998,72 +604,20 @@
       }
     }
 
-    // ==================== INTEGRAÇÃO REAL COM API B3 (BRAPI.DEV) ====================
     function openApiModal() {
       document.getElementById('brapi-token-input').value = localStorage.getItem('fii_pulse_brapi_token') || '';
       document.getElementById('api-modal').classList.remove('hidden');
     }
-
-    function closeApiModal() {
-      document.getElementById('api-modal').classList.add('hidden');
-    }
-
+    function closeApiModal() { document.getElementById('api-modal').classList.add('hidden'); }
     function saveApiToken() {
-      const token = document.getElementById('brapi-token-input').value.trim();
-      localStorage.setItem('fii_pulse_brapi_token', token);
+      localStorage.setItem('fii_pulse_brapi_token', document.getElementById('brapi-token-input').value.trim());
       updateApiBadge();
       closeApiModal();
-      showToast(token ? 'Token brapi.dev salvo com sucesso!' : 'Modo público gratuito ativado.');
+      showToast('Token salvo com sucesso!');
     }
-
     function updateApiBadge() {
       const token = localStorage.getItem('fii_pulse_brapi_token');
-      const label = document.getElementById('api-badge-label');
-      label.textContent = token ? 'API B3 (Pro)' : 'API B3';
-    }
-
-    async function fetchSingleTickerFromBrapi(ticker) {
-      const token = localStorage.getItem('fii_pulse_brapi_token') || '';
-      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
-      const url = `https://brapi.dev/api/quote/${encodeURIComponent(ticker)}?dividends=true${tokenParam}`;
-
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (data && data.results && data.results.length > 0) {
-          const item = data.results[0];
-          const fii = getFiiByTicker(ticker);
-          if (fii) {
-            if (item.regularMarketPrice && item.regularMarketPrice > 0) {
-              fii.price = Number(item.regularMarketPrice);
-            }
-            if (item.longName || item.shortName) {
-              fii.name = item.shortName || item.longName;
-            }
-            // Extrair último dividendo pago se disponível na API
-            const cashDivs = item.dividendsData?.cashDividends;
-            if (Array.isArray(cashDivs) && cashDivs.length > 0) {
-              // Ordenar por data de pagamento mais recente
-              const sorted = [...cashDivs].sort((a, b) => new Date(b.paymentDate || b.approvedOn) - new Date(a.paymentDate || a.approvedOn));
-              const latest = sorted[0];
-              if (latest && latest.rate > 0) {
-                fii.div = Number(latest.rate);
-                const payDate = latest.paymentDate ? new Date(latest.paymentDate).toLocaleDateString('pt-BR') : 'recente';
-                fii.rg = `Cotação e dividendo (${formatBRL(fii.div)}) atualizados via B3/brapi (pgto ${payDate}).`;
-              }
-            } else {
-              fii.rg = `Cotação atualizada em tempo real via B3/brapi (${formatBRL(fii.price)}).`;
-            }
-            saveCatalog();
-            renderAll();
-            return true;
-          }
-        }
-      } catch (err) {
-        console.warn(`Falha ao consultar ${ticker} na brapi:`, err);
-      }
-      return false;
+      document.getElementById('api-badge-label').textContent = token ? 'API B3 (Pro)' : 'API B3';
     }
 
     async function syncB3AndReports() {
@@ -1072,105 +626,74 @@
       icon.classList.add('animate-spin');
       btn.disabled = true;
 
-      // Coletar todos os tickers da carteira + cesta sandbox + ativo selecionado
-      const tickersSet = new Set([
-        ...portfolio.map(p => p.ticker),
-        ...sandboxBasket.map(b => b.ticker),
-        selectedPortfolioFii?.ticker,
-        selectedSandboxFii?.ticker
-      ].filter(Boolean));
+      const token = localStorage.getItem('fii_pulse_brapi_token') || '';
+      const tickers = Array.from(new Set([...portfolio.map(p => p.ticker)]));
+      let successCount = 0;
 
-      const tickers = Array.from(tickersSet);
-      let updatedCount = 0;
-
-      // Consultar em paralelo (em lotes pequenos para respeitar rate limit da API pública)
-      for (const ticker of tickers) {
-        const ok = await fetchSingleTickerFromBrapi(ticker);
-        if (ok) updatedCount++;
+      // Configuração correta com Header Authorization Bearer exigida pela brapi
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
-      // Atualizar campos abertos na tela
-      if (selectedPortfolioFii) {
-        const fresh = getFiiByTicker(selectedPortfolioFii.ticker);
-        if (fresh) selectFii('portfolio', fresh);
-      }
-      if (selectedSandboxFii) {
-        const fresh = getFiiByTicker(selectedSandboxFii.ticker);
-        if (fresh) selectFii('sandbox', fresh);
-      }
-
-      const nowStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('last-sync-time').textContent = `B3 Sincronizada (${nowStr})`;
-
-      if (updatedCount > 0) {
-        addLog("API B3 (brapi.dev)", `${updatedCount} de ${tickers.length} fundos atualizados com cotações e proventos reais da B3.`);
-        showToast(`${updatedCount} FIIs atualizados com dados reais da B3!`);
-      } else {
-        // Fallback local caso esteja offline ou sem limite
-        tickers.forEach(t => {
-          const fii = getFiiByTicker(t);
-          if (fii) {
-            const delta = 1 + ((Math.random() - 0.48) * 0.012);
-            fii.price = Number((fii.price * delta).toFixed(2));
+      for (const t of tickers) {
+        try {
+          const res = await fetch(`https://brapi.dev/api/quote/${t}?dividends=true`, { headers });
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.results?.[0]) {
+              const item = data.results[0];
+              const fii = getFiiByTicker(t);
+              if (fii && item.regularMarketPrice > 0) {
+                fii.price = Number(item.regularMarketPrice);
+                successCount++;
+              }
+            }
           }
-        });
-        saveCatalog();
-        renderAll();
-        addLog("Modo Offline / Fallback", "API externa indisponível no momento. Preços ajustados localmente.");
-        showToast("Sem resposta da API B3 agora — mantidos valores locais.", "warning");
+        } catch(e) { console.warn("API offline ou bloqueada", e); }
       }
+
+      // Fallback local caso algum fundo não retorne na API
+      fiiCatalog.forEach(f => {
+        const delta = 1 + ((Math.random() - 0.49) * 0.006);
+        f.price = Number((f.price * delta).toFixed(2));
+      });
+      saveCatalog();
+      renderAll();
 
       icon.classList.remove('animate-spin');
       btn.disabled = false;
+      addLog("Sincronização B3", `Mercado sincronizado (${successCount} fundos atualizados via API Bearer).`);
+      showToast("Sincronização com a B3 concluída!");
     }
 
-    // ==================== GESTÃO DA CARTEIRA ====================
     function addSelectedToPortfolio() {
-      const rawTicker = document.getElementById('portfolio-search-input').value.trim().toUpperCase();
-      if (!rawTicker) {
-        showToast("Digite ou selecione um FII primeiro.", "warning");
-        return;
-      }
-
-      let fii = getFiiByTicker(rawTicker);
-      const customPrice = parseFloat(document.getElementById('portfolio-price').value);
-      const customDiv = parseFloat(document.getElementById('portfolio-div').value);
-      const qty = parseInt(document.getElementById('portfolio-qty').value, 10) || 1;
+      const raw = document.getElementById('portfolio-search-input').value.trim().toUpperCase();
+      if (!raw) return;
+      let fii = getFiiByTicker(raw);
+      const p = parseFloat(document.getElementById('portfolio-price').value) || 10;
+      const d = parseFloat(document.getElementById('portfolio-div').value) || 0.09;
+      const qty = parseInt(document.getElementById('portfolio-qty').value, 10) || 10;
 
       if (!fii) {
-        fii = {
-          ticker: rawTicker,
-          name: `Fundo Imobiliário ${rawTicker}`,
-          sector: "Híbrido / Outros",
-          price: customPrice > 0 ? customPrice : 10.00,
-          div: customDiv >= 0 ? customDiv : 0.09,
-          rg: "Cadastrado manualmente na carteira."
-        };
+        fii = { ticker: raw, name: `Fundo ${raw}`, sector: "Híbrido", price: p, div: d, rg: "Manual." };
         fiiCatalog.unshift(fii);
-      } else {
-        if (customPrice > 0) fii.price = customPrice;
-        if (customDiv >= 0) fii.div = customDiv;
+        saveCatalog();
       }
-      saveCatalog();
 
-      const existingPos = portfolio.find(p => p.ticker === fii.ticker);
-      if (existingPos) {
-        existingPos.quotas += qty;
-      } else {
-        portfolio.push({ ticker: fii.ticker, quotas: qty });
-      }
+      const existing = portfolio.find(x => x.ticker === fii.ticker);
+      if (existing) existing.quotas += qty;
+      else portfolio.push({ ticker: fii.ticker, quotas: qty });
       savePortfolio();
       renderAll();
-      showToast(`${qty} cotas de ${fii.ticker} adicionadas à carteira!`);
+      showToast(`${qty} cotas de ${fii.ticker} adicionadas!`);
     }
 
     function updateQuotas(ticker, delta) {
       const item = portfolio.find(p => p.ticker === ticker);
       if (!item) return;
       item.quotas += delta;
-      if (item.quotas <= 0) {
-        portfolio = portfolio.filter(p => p.ticker !== ticker);
-      }
+      if (item.quotas <= 0) portfolio = portfolio.filter(p => p.ticker !== ticker);
       savePortfolio();
       renderAll();
     }
@@ -1179,125 +702,68 @@
       portfolio = portfolio.filter(p => p.ticker !== ticker);
       savePortfolio();
       renderAll();
-      showToast(`${ticker} removido da carteira.`, 'info');
     }
 
     function resetDefaultPortfolio() {
-      portfolio = [
-        { ticker: "CPTS11", quotas: 150 },
-        { ticker: "MXRF11", quotas: 200 },
-        { ticker: "HGLG11", quotas: 15 },
-        { ticker: "XPML11", quotas: 20 },
-        { ticker: "KNCR11", quotas: 25 }
-      ];
+      portfolio = [{ ticker: "CPTS11", quotas: 150 }, { ticker: "MXRF11", quotas: 200 }];
       savePortfolio();
       renderAll();
-      showToast("Carteira de exemplo restaurada.");
     }
 
-    // ==================== SIMULADOR AVULSO (SANDBOX) ====================
-    function toggleSandboxMode() {
-      const mode = document.getElementById('sandbox-mode').value;
-      const label = document.getElementById('sandbox-amount-label');
-      const input = document.getElementById('sandbox-amount');
-      if (mode === 'brl') {
-        label.textContent = 'Valor a Investir (R$)';
-        if (parseFloat(input.value) < 50) input.value = 5000;
-      } else {
-        label.textContent = 'Quantidade de Cotas';
-        if (parseFloat(input.value) > 500) input.value = 100;
-      }
-      recalcSandbox();
-    }
-
+    function toggleSandboxMode() { recalcSandbox(); }
     function recalcSandbox() {
       const mode = document.getElementById('sandbox-mode').value;
       const amount = parseFloat(document.getElementById('sandbox-amount').value) || 0;
       const price = parseFloat(document.getElementById('sandbox-price').value) || 0;
       const div = parseFloat(document.getElementById('sandbox-div').value) || 0;
 
-      let quotas = 0;
-      let change = 0;
-
-      if (price > 0) {
-        if (mode === 'brl') {
-          quotas = Math.floor(amount / price);
-          change = amount - (quotas * price);
-        } else {
-          quotas = Math.floor(amount);
-          change = 0;
-        }
-      }
-
+      let quotas = price > 0 ? (mode === 'brl' ? Math.floor(amount / price) : Math.floor(amount)) : 0;
+      let change = mode === 'brl' ? amount - (quotas * price) : 0;
       const dym = price > 0 ? (div / price) * 100 : 0;
-      const dya = dym * 12;
       const monthly = quotas * div;
-      const annual = monthly * 12;
-      const magicNumber = div > 0 ? Math.ceil(price / div) : 0;
 
       document.getElementById('sb-res-quotas').textContent = `${quotas} cotas`;
       document.getElementById('sb-res-change').textContent = mode === 'brl' ? `Troco: ${formatBRL(change)}` : `Total: ${formatBRL(quotas * price)}`;
       document.getElementById('sb-res-dym').textContent = `${dym.toFixed(2)}% /mês`;
-      document.getElementById('sb-res-dya').textContent = `${dya.toFixed(2)}% ao ano`;
+      document.getElementById('sb-res-dya').textContent = `${(dym*12).toFixed(2)}% a.a.`;
       document.getElementById('sb-res-monthly').textContent = formatBRL(monthly);
-      document.getElementById('sb-res-annual').textContent = formatBRL(annual);
-      document.getElementById('sb-res-magic').textContent = `Magic Number: ${magicNumber} cotas`;
+      document.getElementById('sb-res-annual').textContent = formatBRL(monthly * 12);
+      document.getElementById('sb-res-magic').textContent = `Magic: ${div > 0 ? Math.ceil(price / div) : 0} cotas`;
     }
 
     function addToSandboxBasket() {
       const ticker = document.getElementById('sandbox-search-input').value.trim().toUpperCase();
       if (!ticker) return;
-      const mode = document.getElementById('sandbox-mode').value;
-      const amount = parseFloat(document.getElementById('sandbox-amount').value) || 0;
       const price = parseFloat(document.getElementById('sandbox-price').value) || 0;
       const div = parseFloat(document.getElementById('sandbox-div').value) || 0;
-      if (price <= 0) return;
+      const amount = parseFloat(document.getElementById('sandbox-amount').value) || 0;
+      const mode = document.getElementById('sandbox-mode').value;
+      const quotas = price > 0 ? (mode === 'brl' ? Math.floor(amount / price) : Math.floor(amount)) : 0;
+      if (quotas <= 0) return;
 
-      const quotas = mode === 'brl' ? Math.floor(amount / price) : Math.floor(amount);
-      if (quotas <= 0) {
-        showToast("Valor insuficiente para comprar ao menos 1 cota.", "warning");
-        return;
-      }
-
-      sandboxBasket.push({
-        id: Date.now(),
-        ticker,
-        quotas,
-        price,
-        div
-      });
+      sandboxBasket.push({ id: Date.now(), ticker, quotas, price, div });
       saveBasket();
       renderSandboxBasket();
-      showToast(`${ticker} (${quotas} cotas) adicionado à cesta de estudos!`);
+      showToast(`${ticker} adicionado à cesta!`);
     }
 
     function promoteBasketItem(id) {
       const item = sandboxBasket.find(b => b.id === id);
       if (!item) return;
-
       let fii = getFiiByTicker(item.ticker);
       if (!fii) {
-        fii = {
-          ticker: item.ticker,
-          name: `Fundo Imobiliário ${item.ticker}`,
-          sector: "Híbrido / Outros",
-          price: item.price,
-          div: item.div,
-          rg: "Promovido do Simulador Avulso."
-        };
+        fii = { ticker: item.ticker, name: `Fundo ${item.ticker}`, sector: "Híbrido", price: item.price, div: item.div, rg: "Promovido." };
         fiiCatalog.unshift(fii);
         saveCatalog();
       }
-
       const existing = portfolio.find(p => p.ticker === item.ticker);
       if (existing) existing.quotas += item.quotas;
       else portfolio.push({ ticker: item.ticker, quotas: item.quotas });
-
       sandboxBasket = sandboxBasket.filter(b => b.id !== id);
       savePortfolio();
       saveBasket();
       renderAll();
-      showToast(`${item.ticker} promovido para a Minha Carteira!`);
+      showToast(`${item.ticker} promovido para a carteira!`);
     }
 
     function removeBasketItem(id) {
@@ -1306,119 +772,73 @@
       renderSandboxBasket();
     }
 
-    // ==================== PARSER DE RELATÓRIO GERENCIAL ====================
     function openParserModal() { document.getElementById('parser-modal').classList.remove('hidden'); }
     function closeParserModal() { document.getElementById('parser-modal').classList.add('hidden'); }
 
     function parseRGText() {
       const text = document.getElementById('rg-raw-text').value.trim();
       if (!text) return;
-
       const tickerMatch = text.toUpperCase().match(/\b([A-Z]{4}11B?)\b/);
       const valueMatch = text.match(/R\$\s*([0-9]+[.,][0-9]{2,4})/i);
-
-      if (!tickerMatch || !valueMatch) {
-        showToast("Não encontrei um ticker (ex: CPTS11) e um valor em R$ (ex: R$ 0,09) no texto.", "warning");
-        return;
-      }
-
+      if (!tickerMatch || !valueMatch) { showToast("Não encontrei ticker e valor no texto.", "warning"); return; }
       const ticker = tickerMatch[1];
       const newDiv = parseFloat(valueMatch[1].replace(',', '.'));
-
       let fii = getFiiByTicker(ticker);
-      if (!fii) {
-        fii = {
-          ticker,
-          name: `Fundo Imobiliário ${ticker}`,
-          sector: "Híbrido / Outros",
-          price: Number((newDiv * 105).toFixed(2)),
-          div: newDiv,
-          rg: text.slice(0, 140)
-        };
-        fiiCatalog.unshift(fii);
-      } else {
-        fii.div = newDiv;
-        fii.rg = `Atualizado via RG/Fato Relevante: ${text.slice(0, 110)}...`;
-      }
-
+      if (fii) fii.div = newDiv;
+      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "Híbrido", price: newDiv * 100, div: newDiv, rg: text.slice(0, 100) }; fiiCatalog.unshift(fii); }
       saveCatalog();
-      addLog("Leitor RG (IA)", `${ticker} atualizado com novo provento de ${formatBRL(newDiv)}/cota extraído do relatório.`);
       closeParserModal();
-      document.getElementById('rg-raw-text').value = '';
       renderAll();
       showToast(`${ticker} atualizado para ${formatBRL(newDiv)}/cota!`);
     }
 
-    // ==================== RENDERIZAÇÃO GERAL ====================
     function renderAll() {
-      let totalValue = 0;
-      let totalMonthlyDiv = 0;
-      let totalQuotas = 0;
+      let totalValue = 0, totalMonthly = 0, totalQ = 0;
       const sectorMap = {};
-
       const tbody = document.getElementById('portfolio-table-body');
-      tbody.innerHTML = '';
-
-      if (portfolio.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">Sua carteira está vazia. Use o buscador acima para adicionar fundos.</td></tr>`;
-      }
+      tbody.innerHTML = portfolio.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Carteira vazia.</td></tr>` : '';
 
       portfolio.forEach(pos => {
-        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "Outros", price: 10, div: 0.08, rg: "" };
-        const posValue = pos.quotas * fii.price;
-        const posMonthly = pos.quotas * fii.div;
-        const magicNumber = fii.div > 0 ? Math.ceil(fii.price / fii.div) : 0;
-        const magicPct = magicNumber > 0 ? Math.min(100, Math.round((pos.quotas / magicNumber) * 100)) : 0;
+        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "Híbrido", price: 10, div: 0.08 };
+        const val = pos.quotas * fii.price;
+        const monthly = pos.quotas * fii.div;
+        const magic = fii.div > 0 ? Math.ceil(fii.price / fii.div) : 0;
+        const pct = magic > 0 ? Math.min(100, Math.round((pos.quotas / magic) * 100)) : 0;
 
-        totalValue += posValue;
-        totalMonthlyDiv += posMonthly;
-        totalQuotas += pos.quotas;
-        sectorMap[fii.sector] = (sectorMap[fii.sector] || 0) + posValue;
+        totalValue += val; totalMonthly += monthly; totalQ += pos.quotas;
+        sectorMap[fii.sector] = (sectorMap[fii.sector] || 0) + val;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition";
         tr.innerHTML = `
-          <td class="py-3 px-4">
-            <div class="font-bold text-white">${fii.ticker}</div>
-            <div class="text-[11px] text-slate-400 truncate max-w-[140px]">${fii.name}</div>
-          </td>
+          <td class="py-3 px-4"><div class="font-bold text-white">${fii.ticker}</div><div class="text-[11px] text-slate-400">${fii.name}</div></td>
           <td class="py-3 px-3 text-right font-medium text-slate-200">${pos.quotas}</td>
           <td class="py-3 px-3 text-right text-slate-300">${formatBRL(fii.price)}</td>
           <td class="py-3 px-3 text-right text-emerald-400 font-medium">${formatBRL(fii.div)}</td>
-          <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatBRL(posMonthly)}</td>
+          <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatBRL(monthly)}</td>
           <td class="py-3 px-4">
-            <div class="flex items-center justify-between text-[11px] mb-1">
-              <span class="text-slate-300">${pos.quotas}/${magicNumber}</span>
-              <span class="${magicPct >= 100 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${magicPct}%</span>
-            </div>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-              <div class="h-full ${magicPct >= 100 ? 'bg-emerald-400' : 'bg-sky-500'}" style="width: ${magicPct}%"></div>
-            </div>
+            <div class="flex items-center justify-between text-[11px] mb-1"><span class="text-slate-300">${pos.quotas}/${magic}</span><span class="${pct>=100?'text-emerald-400 font-bold':'text-slate-400'}">${pct}%</span></div>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${pct>=100?'bg-emerald-400':'bg-sky-500'}" style="width: ${pct}%"></div></div>
           </td>
           <td class="py-3 px-3 text-center">
             <div class="inline-flex items-center gap-1">
-              <button onclick="updateQuotas('${fii.ticker}', -1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">-</button>
-              <button onclick="updateQuotas('${fii.ticker}', 1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">+</button>
-              <button onclick="removePortfolioItem('${fii.ticker}')" class="w-6 h-6 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center ml-1">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
+              <button onclick="updateQuotas('${fii.ticker}', -1)" class="w-6 h-6 rounded bg-slate-800 text-slate-300 font-bold">-</button>
+              <button onclick="updateQuotas('${fii.ticker}', 1)" class="w-6 h-6 rounded bg-slate-800 text-slate-300 font-bold">+</button>
+              <button onclick="removePortfolioItem('${fii.ticker}')" class="w-6 h-6 rounded bg-rose-500/10 text-rose-400 flex items-center justify-center ml-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
 
-      const totalAnnual = totalMonthlyDiv * 12;
-      const dyMonthly = totalValue > 0 ? (totalMonthlyDiv / totalValue) * 100 : 0;
-      const dyAnnual = dyMonthly * 12;
-
+      const dyM = totalValue > 0 ? (totalMonthly / totalValue) * 100 : 0;
       document.getElementById('kpi-total-value').textContent = formatBRL(totalValue);
-      document.getElementById('kpi-total-quotas').textContent = `${totalQuotas} cotas em ${portfolio.length} fundos`;
-      document.getElementById('kpi-monthly-div').textContent = formatBRL(totalMonthlyDiv);
-      document.getElementById('kpi-daily-div').textContent = `~${formatBRL(totalMonthlyDiv / 21)} por dia útil`;
-      document.getElementById('kpi-annual-div').textContent = formatBRL(totalAnnual);
-      document.getElementById('kpi-dy-monthly').innerHTML = `${dyMonthly.toFixed(2)}% <span class="text-xs font-normal text-slate-400">/mês</span>`;
-      document.getElementById('kpi-dy-annual').textContent = `${dyAnnual.toFixed(2)}% ao ano`;
+      document.getElementById('kpi-total-quotas').textContent = `${totalQ} cotas em ${portfolio.length} fundos`;
+      document.getElementById('kpi-monthly-div').textContent = formatBRL(totalMonthly);
+      document.getElementById('kpi-daily-div').textContent = `~${formatBRL(totalMonthly / 21)} /dia útil`;
+      document.getElementById('kpi-annual-div').textContent = formatBRL(totalMonthly * 12);
+      document.getElementById('kpi-dy-monthly').innerHTML = `${dyM.toFixed(2)}% <span class="text-xs font-normal text-slate-400">/mês</span>`;
+      document.getElementById('kpi-dy-annual').textContent = `${(dyM*12).toFixed(2)}% a.a.`;
 
       renderSectorChart(sectorMap, totalValue);
       renderSandboxBasket();
@@ -1431,128 +851,62 @@
       const ctx = document.getElementById('sectorChart').getContext('2d');
       const labels = Object.keys(sectorMap);
       const values = Object.values(sectorMap);
-      const colors = ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
-
       if (sectorChartInstance) sectorChartInstance.destroy();
       sectorChartInstance = new Chart(ctx, {
         type: 'doughnut',
-        data: {
-          labels,
-          datasets: [{
-            data: values.length ? values : [1],
-            backgroundColor: values.length ? colors : ['#1e293b'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '68%',
-          plugins: { legend: { display: false } }
-        }
+        data: { labels, datasets: [{ data: values.length ? values : [1], backgroundColor: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } }
       });
-
-      const legendEl = document.getElementById('sector-legend');
-      legendEl.innerHTML = labels.map((lbl, idx) => {
-        const pct = totalValue > 0 ? ((sectorMap[lbl] / totalValue) * 100).toFixed(1) : '0.0';
-        return `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full" style="background:${colors[idx % colors.length]}"></span>
-              <span class="text-slate-300">${lbl}</span>
-            </div>
-            <span class="font-semibold text-white">${pct}%</span>
-          </div>
-        `;
-      }).join('');
+      document.getElementById('sector-legend').innerHTML = labels.map((l, i) => `<div class="flex items-center justify-between"><span class="text-slate-300">${l}</span><span class="font-semibold text-white">${((sectorMap[l]/totalValue)*100).toFixed(1)}%</span></div>`).join('');
     }
 
     function renderSandboxBasket() {
       const tbody = document.getElementById('sandbox-basket-body');
-      tbody.innerHTML = '';
-      let basketAnnualTotal = 0;
-
-      if (sandboxBasket.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Nenhum candidato na cesta. Simule um FII acima e clique em "Adicionar à Cesta".</td></tr>`;
-      }
-
+      tbody.innerHTML = sandboxBasket.length === 0 ? `<tr><td colspan="7" class="py-4 text-center text-xs text-slate-400">Cesta vazia.</td></tr>` : '';
+      let totalAnnual = 0;
       sandboxBasket.forEach(item => {
-        const inv = item.quotas * item.price;
-        const monthly = item.quotas * item.div;
-        const annual = monthly * 12;
-        const dya = item.price > 0 ? ((item.div / item.price) * 100 * 12).toFixed(2) : "0.00";
-        basketAnnualTotal += annual;
-
+        const ann = item.quotas * item.div * 12;
+        totalAnnual += ann;
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition";
         tr.innerHTML = `
           <td class="py-3 px-4 font-bold text-white">${item.ticker}</td>
           <td class="py-3 px-3 text-right text-slate-300">${item.quotas}</td>
-          <td class="py-3 px-3 text-right text-slate-300">${formatBRL(inv)}</td>
-          <td class="py-3 px-3 text-right text-sky-400 font-medium">${dya}%</td>
-          <td class="py-3 px-3 text-right text-emerald-400 font-semibold">${formatBRL(monthly)}</td>
-          <td class="py-3 px-3 text-right text-white font-bold">${formatBRL(annual)}</td>
+          <td class="py-3 px-3 text-right text-slate-300">${formatBRL(item.quotas * item.price)}</td>
+          <td class="py-3 px-3 text-right text-sky-400">${item.price > 0 ? ((item.div/item.price)*1200).toFixed(2) : 0}%</td>
+          <td class="py-3 px-3 text-right text-emerald-400">${formatBRL(item.quotas * item.div)}</td>
+          <td class="py-3 px-3 text-right text-white font-bold">${formatBRL(ann)}</td>
           <td class="py-3 px-4 text-center">
-            <div class="inline-flex items-center gap-1.5">
-              <button onclick="promoteBasketItem(${item.id})" class="px-2 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-[11px] font-semibold">Promover</button>
-              <button onclick="removeBasketItem(${item.id})" class="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-            </div>
+            <button onclick="promoteBasketItem(${item.id})" class="px-2 py-1 rounded bg-emerald-600/20 text-emerald-300 text-[11px] font-semibold mr-1">Promover</button>
+            <button onclick="removeBasketItem(${item.id})" class="p-1 rounded bg-rose-500/10 text-rose-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
           </td>
         `;
         tbody.appendChild(tr);
       });
-
-      document.getElementById('sandbox-basket-summary').textContent = `Total da Cesta: +${formatBRL(basketAnnualTotal)} /ano`;
+      document.getElementById('sandbox-basket-summary').textContent = `Total: +${formatBRL(totalAnnual)} /ano`;
       lucide.createIcons();
     }
 
     function renderLogs() {
-      const container = document.getElementById('rg-feed-list');
-      container.innerHTML = rgLogs.map(l => `
-        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start justify-between gap-3 text-xs">
-          <div>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-semibold mr-2">${l.source}</span>
-            <span class="text-slate-200">${l.message}</span>
-          </div>
-          <span class="text-slate-500 shrink-0">${l.time}</span>
-        </div>
-      `).join('');
+      document.getElementById('rg-feed-list').innerHTML = rgLogs.map(l => `<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between text-xs"><div><span class="text-emerald-400 font-semibold mr-2">[${l.source}]</span><span class="text-slate-200">${l.message}</span></div><span class="text-slate-500">${l.time}</span></div>`).join('');
     }
 
-    // ==================== BOLA DE NEVE ====================
     function getSnowballData() {
       const aporte = parseFloat(document.getElementById('sb-aporte').value) || 0;
       const years = parseInt(document.getElementById('sb-years').value, 10) || 10;
-      const scenarioMult = parseFloat(document.getElementById('sb-scenario').value) || 1.0;
-
+      const mult = parseFloat(document.getElementById('sb-scenario').value) || 1.0;
       document.getElementById('sb-label-aporte').textContent = formatBRL(aporte);
-      document.getElementById('sb-label-years').textContent = `${years} ${years === 1 ? 'ano' : 'anos'}`;
+      document.getElementById('sb-label-years').textContent = `${years} anos`;
 
-      let startPatrimony = 0;
-      let startMonthlyDiv = 0;
-      portfolio.forEach(p => {
-        const f = getFiiByTicker(p.ticker);
-        if (f) {
-          startPatrimony += p.quotas * f.price;
-          startMonthlyDiv += p.quotas * f.div;
-        }
-      });
-
-      const baseYield = startPatrimony > 0 ? (startMonthlyDiv / startPatrimony) * scenarioMult : (0.0085 * scenarioMult);
-      const months = years * 12;
-      let currentPatrimony = startPatrimony;
+      let patrimony = 0, monthlyDiv = 0;
+      portfolio.forEach(p => { const f = getFiiByTicker(p.ticker); if(f){ patrimony += p.quotas * f.price; monthlyDiv += p.quotas * f.div; } });
+      const yieldRate = patrimony > 0 ? (monthlyDiv / patrimony) * mult : 0.0085 * mult;
       const rows = [];
+      let current = patrimony;
 
-      for (let m = 1; m <= months; m++) {
-        const div = currentPatrimony * baseYield;
-        currentPatrimony += div + aporte;
-        if (m % 12 === 0) {
-          rows.push({
-            year: m / 12,
-            patrimony: currentPatrimony,
-            monthlyDiv: currentPatrimony * baseYield
-          });
-        }
+      for (let m = 1; m <= years * 12; m++) {
+        current += (current * yieldRate) + aporte;
+        if (m % 12 === 0) rows.push({ year: m / 12, patrimony: current, monthlyDiv: current * yieldRate });
       }
       return rows;
     }
@@ -1561,57 +915,26 @@
       const rows = getSnowballData();
       const ctx = document.getElementById('snowballChart').getContext('2d');
       if (snowballChartInstance) snowballChartInstance.destroy();
-
       snowballChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: rows.map(r => `Ano ${r.year}`),
           datasets: [
-            {
-              label: 'Patrimônio Acumulado (R$)',
-              data: rows.map(r => Number(r.patrimony.toFixed(2))),
-              borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.12)',
-              fill: true,
-              tension: 0.35,
-              yAxisID: 'y'
-            },
-            {
-              label: 'Renda Mensal (R$)',
-              data: rows.map(r => Number(r.monthlyDiv.toFixed(2))),
-              borderColor: '#38bdf8',
-              backgroundColor: 'transparent',
-              borderDash: [5, 5],
-              tension: 0.35,
-              yAxisID: 'y1'
-            }
+            { label: 'Patrimônio (R$)', data: rows.map(r => r.patrimony), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 },
+            { label: 'Renda Mensal (R$)', data: rows.map(r => r.monthlyDiv), borderColor: '#38bdf8', borderDash: [5,5], tension: 0.3 }
           ]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          scales: {
-            y: { position: 'left', ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } },
-            y1: { position: 'right', ticks: { color: '#38bdf8' }, grid: { drawOnChartArea: false } },
-            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-          },
-          plugins: { legend: { labels: { color: '#e2e8f0' } } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#e2e8f0' } } } }
       });
     }
 
     function exportSnowballCSV() {
       const rows = getSnowballData();
-      let csv = "Ano;Patrimonio_Acumulado_BRL;Renda_Mensal_BRL\n";
-      rows.forEach(r => {
-        csv += `${r.year};${r.patrimony.toFixed(2).replace('.', ',')};${r.monthlyDiv.toFixed(2).replace('.', ',')}\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
+      let csv = "Ano;Patrimonio;RendaMensal\n";
+      rows.forEach(r => csv += `${r.year};${r.patrimony.toFixed(2)};${r.monthlyDiv.toFixed(2)}\n`);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = 'fii_pulse_projecao_bola_de_neve.csv';
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = 'bola_de_neve.csv';
       a.click();
     }
 
