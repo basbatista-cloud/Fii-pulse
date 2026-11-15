@@ -14,12 +14,6 @@
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     .glass-card { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); }
-    .pulse-dot { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
@@ -33,22 +27,22 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg font-bold tracking-tight text-white">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">API B3 Live</span>
+            <span id="live-status-badge" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/35">Aguardando Sync</span>
           </div>
-          <p class="text-xs text-slate-400">Simulador de Proventos & Relatórios Gerenciais</p>
+          <p id="last-sync-text" class="text-xs text-slate-400">Simulador em Tempo Real • B3</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button onclick="openApiModal()" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300 transition">
           <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span id="api-badge-label" class="hidden sm:inline">API B3</span>
+          <span id="api-badge-label">Token B3</span>
         </button>
         <button onclick="openParserModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition">
           <i data-lucide="file-text" class="w-3.5 h-3.5 text-sky-400"></i>
           <span class="hidden sm:inline">Ler RG (IA)</span>
         </button>
-        <button id="sync-btn" onclick="syncAllPortfolioWithB3()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition">
+        <button id="sync-btn" onclick="syncAllPortfolioWithB3(true)" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition">
           <i id="sync-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Sincronizar B3</span>
         </button>
@@ -59,13 +53,25 @@
       <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tab-btn active px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap"><i data-lucide="briefcase" class="w-4 h-4"></i> Minha Carteira</button>
       <button onclick="switchTab('sandbox')" id="tab-sandbox" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="flask-conical" class="w-4 h-4"></i> Simulador Avulso</button>
       <button onclick="switchTab('snowball')" id="tab-snowball" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="sparkles" class="w-4 h-4"></i> Bola de Neve</button>
-      <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="newspaper" class="w-4 h-4"></i> Feed RG & Logs</button>
+      <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap"><i data-lucide="newspaper" class="w-4 h-4"></i> Logs & Diagnóstico</button>
     </div>
   </header>
 
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm"></div>
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- AVISO CASO NÃO TENHA TOKEN -->
+    <div id="no-token-banner" class="hidden p-4 rounded-2xl bg-amber-500/10 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div class="flex items-start gap-3">
+        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 shrink-0 mt-0.5"></i>
+        <div class="text-xs text-amber-200">
+          <strong class="block text-sm text-amber-300">Token da brapi.dev não configurado</strong>
+          Sem token, a API da B3 libera apenas ativos de teste (MXRF11 e HGLG11) e bloqueia SNAG11, SNEL11, CPTS11, etc. Configure seu token gratuito ou Pro para puxar todos os FIIs ao vivo.
+        </div>
+      </div>
+      <button onclick="openApiModal()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs whitespace-nowrap">Configurar Token</button>
+    </div>
+
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <div class="glass-card rounded-2xl p-4">
         <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Patrimônio</span><i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i></div>
@@ -94,25 +100,30 @@
       <div class="glass-card rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII da B3</h2>
-            <p class="text-xs text-slate-400">Digite qualquer ticker (ex: SNAG11, SNEL11, CPTS11) para buscar cotação real na bolsa.</p>
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Buscar & Adicionar FII da B3</h2>
+            <p class="text-xs text-slate-400">Digite o ticker (ex: SNAG11, SNEL11, CPTS11) e clique em buscar na B3 para preencher os valores reais.</p>
           </div>
-          <span class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 self-start">Busca Universal B3</span>
+          <button onclick="resetAllCache()" class="text-[11px] px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 self-start">Limpar Cache Antigo</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div class="md:col-span-5 relative">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Buscar Ticker na B3</label>
-            <div class="relative">
-              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="portfolio-search-input" placeholder="Ex: SNAG11, SNEL11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onfocus="handleSearchInput('portfolio', this.value)" onkeydown="handleSearchKeydown(event, 'portfolio')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
-              <button onclick="clearSearch('portfolio')" id="portfolio-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Ticker na B3</label>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="portfolio-search-input" placeholder="Ex: SNAG11, SNEL11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault(); fetchAndSelectFromB3('portfolio', this.value);}" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
+                <button onclick="clearSearch('portfolio')" id="portfolio-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+              </div>
+              <button onclick="fetchAndSelectFromB3('portfolio', document.getElementById('portfolio-search-input').value)" class="px-3.5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap">
+                <i data-lucide="cloud-download" class="w-4 h-4"></i> Puxar API
+              </button>
             </div>
             <div id="portfolio-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Cotação (R$)</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Cotação B3 (R$)</label>
             <input type="number" step="0.01" id="portfolio-price" placeholder="0,00" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500" />
           </div>
 
@@ -127,7 +138,7 @@
           </div>
 
           <div class="md:col-span-1">
-            <button onclick="addSelectedToPortfolio()" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-1 shadow-lg shadow-emerald-600/20 transition"><i data-lucide="plus" class="w-4 h-4"></i></button>
+            <button onclick="addSelectedToPortfolio()" title="Adicionar à carteira" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-1 shadow-lg shadow-emerald-600/20 transition"><i data-lucide="plus" class="w-4 h-4"></i></button>
           </div>
         </div>
 
@@ -137,7 +148,7 @@
             <span id="sel-badge-name" class="text-slate-200 font-medium"></span>
             <span id="sel-badge-sector" class="text-slate-400"></span>
           </div>
-          <span id="sel-badge-rg" class="text-sky-400 italic">Buscando dados na B3...</span>
+          <span id="sel-badge-rg" class="text-sky-400 italic"></span>
         </div>
       </div>
 
@@ -145,7 +156,7 @@
         <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden flex flex-col">
           <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <h3 class="font-bold text-sm text-white flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> Ativos na Carteira & Magic Number</h3>
-            <button onclick="resetDefaultPortfolio()" class="text-xs text-slate-400 hover:text-slate-200 underline">Restaurar Exemplo</button>
+            <span class="text-[11px] text-slate-400">Valores em tempo real</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -184,7 +195,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i> Simulador Avulso (Sem Comprar)</h2>
-            <p class="text-xs text-slate-400">Teste fundos buscando direto da B3.</p>
+            <p class="text-xs text-slate-400">Puxe qualquer fundo direto da B3 para simular rendimentos.</p>
           </div>
           <span class="text-[11px] px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 self-start">Isolado</span>
         </div>
@@ -192,10 +203,13 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div class="md:col-span-4 relative">
             <label class="block text-xs font-medium text-slate-300 mb-1">Buscar FII na B3</label>
-            <div class="relative">
-              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="sandbox-search-input" placeholder="Ex: SNAG11, CPTS11..." autocomplete="off" oninput="handleSearchInput('sandbox', this.value)" onfocus="handleSearchInput('sandbox', this.value)" onkeydown="handleSearchKeydown(event, 'sandbox')" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 uppercase" />
-              <button onclick="clearSearch('sandbox')" id="sandbox-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="sandbox-search-input" placeholder="Ex: SNAG11, CPTS11..." autocomplete="off" oninput="handleSearchInput('sandbox', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault(); fetchAndSelectFromB3('sandbox', this.value);}" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 uppercase" />
+                <button onclick="clearSearch('sandbox')" id="sandbox-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+              </div>
+              <button onclick="fetchAndSelectFromB3('sandbox', document.getElementById('sandbox-search-input').value)" class="px-3 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold">API</button>
             </div>
             <div id="sandbox-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
           </div>
@@ -214,12 +228,12 @@
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Preço Alvo (R$)</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Preço B3 (R$)</label>
             <input type="number" step="0.01" id="sandbox-price" oninput="recalcSandbox()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500" />
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Div. Est. (R$)</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Div. B3 (R$)</label>
             <input type="number" step="0.001" id="sandbox-div" oninput="recalcSandbox()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500" />
           </div>
         </div>
@@ -317,8 +331,8 @@
       <div class="glass-card rounded-2xl p-5">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-base font-bold text-white">Feed de Sincronização & Relatórios</h2>
-            <p class="text-xs text-slate-400">Histórico de cotações e parser de Fatos Relevantes.</p>
+            <h2 class="text-base font-bold text-white">Logs de Requisições da API & Diagnóstico</h2>
+            <p class="text-xs text-slate-400">Acompanhe exatamente o que a API brapi.dev respondeu em cada chamada.</p>
           </div>
           <button onclick="openParserModal()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5"><i data-lucide="file-search" class="w-4 h-4"></i> Colar Relatório</button>
         </div>
@@ -334,14 +348,14 @@
         <h3 class="font-bold text-base text-white flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Token brapi.dev</h3>
         <button onclick="closeApiModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-xs text-slate-300 leading-relaxed">Cole seu token da brapi.dev (Ex: <code>EQxgoDZNHytV8NLQuptC5i</code>).</p>
+      <p class="text-xs text-slate-300 leading-relaxed">Cole seu token da brapi.dev. Ao salvar, o aplicativo sincronizará automaticamente com a B3 via parâmetro seguro de URL.</p>
       <div>
         <label class="block text-xs font-medium text-slate-300 mb-1">Token</label>
         <input type="text" id="brapi-token-input" placeholder="Cole o token aqui sem espaços" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500" />
       </div>
       <div class="flex justify-end gap-2 pt-2">
         <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-medium text-slate-300">Cancelar</button>
-        <button onclick="saveApiToken()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Salvar</button>
+        <button onclick="saveApiToken()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Salvar e Sincronizar</button>
       </div>
     </div>
   </div>
@@ -363,6 +377,7 @@
   </div>
 
   <script>
+    const STORAGE_VERSION = 'v7';
     let fiiCatalog = [];
     let portfolio = [];
     let sandboxBasket = [];
@@ -371,21 +386,25 @@
     let snowballChartInstance = null;
 
     function init() {
-      const savedCatalog = localStorage.getItem('fii_pulse_catalog_v6');
+      // Limpa chaves antigas de versões anteriores para evitar dados fantasmas
+      ['v5', 'v6'].forEach(oldV => {
+        localStorage.removeItem(`fii_pulse_catalog_${oldV}`);
+        localStorage.removeItem(`fii_pulse_portfolio_${oldV}`);
+      });
+
+      const savedCatalog = localStorage.getItem(`fii_pulse_catalog_${STORAGE_VERSION}`);
       if (savedCatalog) {
         fiiCatalog = JSON.parse(savedCatalog);
       } else {
         fiiCatalog = [
-          { ticker: "CPTS11", name: "Capitânia Securities II", sector: "Papel / CRI", price: 6.88, div: 0.09, rg: "Busca dinâmica ativa." },
-          { ticker: "SNAG11", name: "Suno Agro", sector: "Fiagro", price: 9.57, div: 0.12, rg: "Busca dinâmica ativa." },
-          { ticker: "SNEL11", name: "Suno Energias Limpas", sector: "Híbrido", price: 7.24, div: 0.05, rg: "Busca dinâmica ativa." },
-          { ticker: "MXRF11", name: "Maxi Renda", sector: "Papel / CRI", price: 9.65, div: 0.095, rg: "Busca dinâmica ativa." },
-          { ticker: "HGLG11", name: "CSHG Logística", sector: "Logística", price: 156.80, div: 1.10, rg: "Busca dinâmica ativa." }
+          { ticker: "CPTS11", name: "Capitânia Securities II", sector: "FII / B3", price: 0, div: 0, updatedAt: null },
+          { ticker: "SNAG11", name: "Suno Agro", sector: "Fiagro / B3", price: 0, div: 0, updatedAt: null },
+          { ticker: "SNEL11", name: "Suno Energias Limpas", sector: "FII / B3", price: 0, div: 0, updatedAt: null }
         ];
         saveCatalog();
       }
 
-      const savedPortfolio = localStorage.getItem('fii_pulse_portfolio_v6');
+      const savedPortfolio = localStorage.getItem(`fii_pulse_portfolio_${STORAGE_VERSION}`);
       if (savedPortfolio) {
         portfolio = JSON.parse(savedPortfolio);
       } else {
@@ -397,20 +416,18 @@
         savePortfolio();
       }
 
-      const savedBasket = localStorage.getItem('fii_pulse_basket_v6');
+      const savedBasket = localStorage.getItem(`fii_pulse_basket_${STORAGE_VERSION}`);
       if (savedBasket) sandboxBasket = JSON.parse(savedBasket);
 
-      const savedLogs = localStorage.getItem('fii_pulse_logs_v6');
-      if (savedLogs) {
-        rgLogs = JSON.parse(savedLogs);
-      } else {
-        addLog("Sistema", "FII Pulse inicializado com API B3 Live.");
-      }
+      const savedLogs = localStorage.getItem(`fii_pulse_logs_${STORAGE_VERSION}`);
+      if (savedLogs) rgLogs = JSON.parse(savedLogs);
 
-      selectFii('sandbox', fiiCatalog[0]);
       updateApiBadge();
       renderAll();
       lucide.createIcons();
+
+      // Sincroniza automaticamente ao abrir o app
+      syncAllPortfolioWithB3(false);
 
       document.addEventListener('click', (e) => {
         if (!e.target.closest('#portfolio-search-input') && !e.target.closest('#portfolio-dropdown')) {
@@ -422,10 +439,18 @@
       });
     }
 
-    function saveCatalog() { localStorage.setItem('fii_pulse_catalog_v6', JSON.stringify(fiiCatalog)); }
-    function savePortfolio() { localStorage.setItem('fii_pulse_portfolio_v6', JSON.stringify(portfolio)); }
-    function saveBasket() { localStorage.setItem('fii_pulse_basket_v6', JSON.stringify(sandboxBasket)); }
-    function saveLogs() { localStorage.setItem('fii_pulse_logs_v6', JSON.stringify(rgLogs)); }
+    function resetAllCache() {
+      localStorage.removeItem(`fii_pulse_catalog_${STORAGE_VERSION}`);
+      localStorage.removeItem(`fii_pulse_portfolio_${STORAGE_VERSION}`);
+      localStorage.removeItem(`fii_pulse_basket_${STORAGE_VERSION}`);
+      localStorage.removeItem(`fii_pulse_logs_${STORAGE_VERSION}`);
+      location.reload();
+    }
+
+    function saveCatalog() { localStorage.setItem(`fii_pulse_catalog_${STORAGE_VERSION}`, JSON.stringify(fiiCatalog)); }
+    function savePortfolio() { localStorage.setItem(`fii_pulse_portfolio_${STORAGE_VERSION}`, JSON.stringify(portfolio)); }
+    function saveBasket() { localStorage.setItem(`fii_pulse_basket_${STORAGE_VERSION}`, JSON.stringify(sandboxBasket)); }
+    function saveLogs() { localStorage.setItem(`fii_pulse_logs_${STORAGE_VERSION}`, JSON.stringify(rgLogs)); }
 
     function getFiiByTicker(ticker) {
       return fiiCatalog.find(f => f.ticker.toUpperCase() === ticker.toUpperCase());
@@ -443,13 +468,13 @@
       el.innerHTML = `<i data-lucide="info" class="w-4 h-4 shrink-0"></i><span>${msg}</span>`;
       container.appendChild(el);
       lucide.createIcons();
-      setTimeout(() => el.remove(), 4200);
+      setTimeout(() => el.remove(), 4500);
     }
 
     function addLog(source, message) {
-      const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       rgLogs.unshift({ time, source, message });
-      if (rgLogs.length > 40) rgLogs.pop();
+      if (rgLogs.length > 50) rgLogs.pop();
       saveLogs();
       renderLogs();
     }
@@ -468,8 +493,85 @@
       if (tab === 'snowball') updateSnowball();
     }
 
-    // BUSCA UNIVERSAL NA API B3 AO DIGITAR
-    async function handleSearchInput(context, rawQuery) {
+    // CONSULTA UNIFICADA NA API BRAPI (COTAÇÃO + DIVIDENDOS DE FII)
+    async function fetchTickerLiveFromBrapi(ticker) {
+      const formatted = ticker.toUpperCase().trim();
+      const token = (localStorage.getItem('fii_pulse_brapi_token') || '').trim();
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+      const tokenFirstParam = token ? `?token=${encodeURIComponent(token)}` : '';
+
+      let price = 0;
+      let div = 0;
+      let name = `Fundo ${formatted}`;
+      let sector = "FII / B3";
+      let marketTime = null;
+
+      // 1. Buscar Cotação Atual (/api/quote/{ticker})
+      const quoteUrl = `https://brapi.dev/api/quote/${formatted}?dividends=true${tokenParam}`;
+      const resQuote = await fetch(quoteUrl);
+      if (!resQuote.ok) {
+        const errText = await resQuote.text();
+        throw new Error(`HTTP ${resQuote.status} em quote/${formatted}: ${errText.slice(0, 120)}`);
+      }
+      const dataQuote = await resQuote.json();
+      const item = dataQuote?.results?.[0];
+      if (!item) throw new Error(`Ticker ${formatted} não encontrado na resposta.`);
+
+      price = Number(item.regularMarketPrice || 0);
+      name = item.shortName || item.longName || name;
+      marketTime = item.regularMarketTime || new Date().toISOString();
+
+      // Tenta extrair dividendo do quote caso venha
+      const cashDivs = item.dividendsData?.cashDividends;
+      if (Array.isArray(cashDivs) && cashDivs.length > 0) {
+        const sorted = [...cashDivs].sort((a, b) => new Date(b.paymentDate || b.approvedOn) - new Date(a.paymentDate || a.approvedOn));
+        if (sorted[0]?.rate > 0) div = Number(sorted[0].rate);
+      }
+
+      // 2. Buscar Dividendos Específicos de FIIs (/api/v2/fii/dividends)
+      try {
+        const fiiDivUrl = `https://brapi.dev/api/v2/fii/dividends?symbols=${formatted}&sortBy=paymentDate&sortOrder=desc${tokenParam}`;
+        const resDiv = await fetch(fiiDivUrl);
+        if (resDiv.ok) {
+          const dataDiv = await resDiv.json();
+          const divsList = dataDiv?.dividends || [];
+          const rendimentos = divsList.filter(d => (d.label || '').toUpperCase().includes('RENDIMENTO') && (d.rawRate || d.rate) > 0);
+          if (rendimentos.length > 0) {
+            div = Number(rendimentos[0].rawRate || rendimentos[0].rate);
+          } else if (divsList.length > 0 && (divsList[0].rawRate || divsList[0].rate) > 0) {
+            div = Number(divsList[0].rawRate || divsList[0].rate);
+          }
+        }
+      } catch (e) {
+        console.warn("Endpoint v2/fii/dividends indisponível ou sem plano Pro:", e);
+      }
+
+      // 3. Buscar Indicadores de FIIs (/api/v2/fii/indicators) para segmento e DY
+      try {
+        const fiiIndUrl = `https://brapi.dev/api/v2/fii/indicators?symbols=${formatted}${tokenParam}`;
+        const resInd = await fetch(fiiIndUrl);
+        if (resInd.ok) {
+          const dataInd = await resInd.json();
+          const ind = dataInd?.indicators?.[0] || dataInd?.results?.[0];
+          if (ind) {
+            if (ind.segmentoAtuacao || ind.segmentType) {
+              sector = ind.segmentoAtuacao || ind.segmentType;
+            }
+            // Se ainda não temos dividendo unitário, estima pelo DY mensal ou 12m
+            if (div === 0 && price > 0) {
+              if (ind.lastDividend > 0) div = Number(ind.lastDividend);
+              else if (ind.dividendYield12m > 0) div = Number(((ind.dividendYield12m / 100 / 12) * price).toFixed(4));
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Endpoint v2/fii/indicators indisponível:", e);
+      }
+
+      return { ticker: formatted, name, sector, price, div, updatedAt: marketTime };
+    }
+
+    function handleSearchInput(context, rawQuery) {
       const dropdown = document.getElementById(`${context}-dropdown`);
       const clearBtn = document.getElementById(`${context}-clear-btn`);
       const cleanTicker = rawQuery.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -482,10 +584,23 @@
         return;
       }
 
-      // Filtrar locais existentes
-      let matches = fiiCatalog.filter(f => f.ticker.includes(cleanTicker) || f.name.toUpperCase().includes(cleanTicker));
-
+      const matches = fiiCatalog.filter(f => f.ticker.includes(cleanTicker) || f.name.toUpperCase().includes(cleanTicker));
       let html = '';
+
+      if (cleanTicker.length >= 4) {
+        const formatted = cleanTicker.endsWith('11') || cleanTicker.endsWith('11B') ? cleanTicker : `${cleanTicker}11`;
+        html += `
+          <div onclick="fetchAndSelectFromB3('${context}', '${formatted}')" class="dropdown-item p-3 bg-emerald-500/15 hover:bg-emerald-500/25 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <i data-lucide="cloud-download" class="w-4 h-4"></i> Consultar ${formatted} ao vivo na B3
+              </div>
+              <div class="text-[11px] text-slate-300">Buscar cotação atual e último rendimento</div>
+            </div>
+          </div>
+        `;
+      }
+
       matches.forEach(f => {
         html += `
           <div onclick="selectFiiByTicker('${context}', '${f.ticker}')" class="dropdown-item p-2.5 hover:bg-slate-800 cursor-pointer flex items-center justify-between transition">
@@ -504,20 +619,6 @@
         `;
       });
 
-      // Se tiver 4 ou mais letras e não estiver na lista local, buscar direto da B3 via API
-      if (cleanTicker.length >= 4 && !getFiiByTicker(cleanTicker)) {
-        html += `
-          <div onclick="fetchAndSelectFromB3('${context}', '${cleanTicker}')" class="dropdown-item p-3 bg-emerald-500/15 hover:bg-emerald-500/25 cursor-pointer flex items-center justify-between transition">
-            <div>
-              <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                <i data-lucide="cloud-download" class="w-4 h-4"></i> Buscar ${cleanTicker} direto da B3
-              </div>
-              <div class="text-[11px] text-slate-300">Puxar cotação e proventos reais da bolsa</div>
-            </div>
-          </div>
-        `;
-      }
-
       dropdown.innerHTML = html;
       dropdown.classList.remove('hidden');
       lucide.createIcons();
@@ -527,83 +628,56 @@
       document.getElementById(`${context}-search-input`).value = '';
       document.getElementById(`${context}-clear-btn`).classList.add('hidden');
       document.getElementById(`${context}-dropdown`).classList.add('hidden');
-      if (context === 'portfolio') { selectedPortfolioFii = null; document.getElementById('portfolio-selected-info').classList.add('hidden'); }
+      if (context === 'portfolio') document.getElementById('portfolio-selected-info').classList.add('hidden');
     }
 
-    async function fetchAndSelectFromB3(context, ticker) {
-      const formatted = ticker.endsWith('11') || ticker.endsWith('11B') ? ticker : `${ticker}11`;
-      showToast(`Consultando ${formatted} na B3...`, 'info');
+    async function fetchAndSelectFromB3(context, rawTicker) {
+      const clean = (rawTicker || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!clean) return;
+      const formatted = clean.endsWith('11') || clean.endsWith('11B') ? clean : `${clean}11`;
 
-      const token = localStorage.getItem('fii_pulse_brapi_token') || '';
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-
+      showToast(`Buscando ${formatted} ao vivo na B3...`, 'info');
       try {
-        const res = await fetch(`https://brapi.dev/api/quote/${formatted}?dividends=true`, { headers });
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.results?.[0]) {
-            const item = data.results[0];
-            const price = item.regularMarketPrice || 10.00;
-            let div = 0.09;
-            const cashDivs = item.dividendsData?.cashDividends;
-            if (Array.isArray(cashDivs) && cashDivs.length > 0) {
-              const sorted = [...cashDivs].sort((a, b) => new Date(b.paymentDate || b.approvedOn) - new Date(a.paymentDate || a.approvedOn));
-              if (sorted[0]?.rate > 0) div = Number(sorted[0].rate);
-            }
-
-            const newFii = {
-              ticker: formatted,
-              name: item.shortName || item.longName || `Fundo ${formatted}`,
-              sector: item.sector || "FII / B3",
-              price: Number(price),
-              div: Number(div),
-              rg: `Importado da B3 em ${new Date().toLocaleDateString('pt-BR')}.`
-            };
-
-            fiiCatalog.unshift(newFii);
-            saveCatalog();
-            selectFii(context, newFii);
-            showToast(`${formatted} carregado com sucesso da B3!`);
-            return;
+        const liveData = await fetchTickerLiveFromBrapi(formatted);
+        const existingIdx = fiiCatalog.findIndex(f => f.ticker === formatted);
+        if (existingIdx >= 0) {
+          // Mantém dividendo anterior apenas se a API retornar 0
+          if (liveData.div === 0 && fiiCatalog[existingIdx].div > 0) {
+            liveData.div = fiiCatalog[existingIdx].div;
           }
+          fiiCatalog[existingIdx] = liveData;
+        } else {
+          fiiCatalog.unshift(liveData);
         }
-      } catch(e) { console.warn("Erro ao buscar da B3", e); }
-
-      // Fallback caso falhe
-      quickCreateAndSelect(context, formatted);
+        saveCatalog();
+        selectFii(context, liveData);
+        renderAll();
+        addLog("Consulta B3", `${formatted}: Cotação ${formatBRL(liveData.price)} | Div ${formatBRL(liveData.div)}`);
+        showToast(`${formatted} atualizado: ${formatBRL(liveData.price)}`);
+      } catch (err) {
+        addLog("Erro API", `Falha ao buscar ${formatted}: ${err.message}`);
+        showToast(`Erro ao buscar ${formatted}. Verifique seu token ou veja Logs.`, 'warning');
+      }
     }
 
     function selectFiiByTicker(context, ticker) { selectFii(context, getFiiByTicker(ticker)); }
 
-    function quickCreateAndSelect(context, ticker) {
-      const formatted = ticker.endsWith('11') || ticker.endsWith('11B') ? ticker : `${ticker}11`;
-      let existing = getFiiByTicker(formatted);
-      if (!existing) {
-        existing = { ticker: formatted, name: `Fundo ${formatted}`, sector: "FII / B3", price: 10.00, div: 0.09, rg: "Cadastrado manualmente." };
-        fiiCatalog.unshift(existing);
-        saveCatalog();
-      }
-      selectFii(context, existing);
-      showToast(`${formatted} selecionado!`);
-    }
-
     function selectFii(context, fii) {
+      if (!fii) return;
       document.getElementById(`${context}-search-input`).value = fii.ticker;
       document.getElementById(`${context}-dropdown`).classList.add('hidden');
       document.getElementById(`${context}-clear-btn`).classList.remove('hidden');
       if (context === 'portfolio') {
-        selectedPortfolioFii = fii;
-        document.getElementById('portfolio-price').value = fii.price.toFixed(2);
-        document.getElementById('portfolio-div').value = fii.div.toFixed(3);
+        document.getElementById('portfolio-price').value = fii.price ? fii.price.toFixed(2) : '';
+        document.getElementById('portfolio-div').value = fii.div ? fii.div.toFixed(3) : '';
         document.getElementById('sel-badge-ticker').textContent = fii.ticker;
         document.getElementById('sel-badge-name').textContent = fii.name;
         document.getElementById('sel-badge-sector').textContent = `• ${fii.sector}`;
-        document.getElementById('sel-badge-rg').textContent = fii.rg;
+        document.getElementById('sel-badge-rg').textContent = fii.updatedAt ? `Atualizado: ${new Date(fii.updatedAt).toLocaleString('pt-BR')}` : 'Aguardando sincronização';
         document.getElementById('portfolio-selected-info').classList.remove('hidden');
       } else {
-        selectedSandboxFii = fii;
-        document.getElementById('sandbox-price').value = fii.price.toFixed(2);
-        document.getElementById('sandbox-div').value = fii.div.toFixed(3);
+        document.getElementById('sandbox-price').value = fii.price ? fii.price.toFixed(2) : '';
+        document.getElementById('sandbox-div').value = fii.div ? fii.div.toFixed(3) : '';
         recalcSandbox();
       }
     }
@@ -614,47 +688,50 @@
     }
     function closeApiModal() { document.getElementById('api-modal').classList.add('hidden'); }
     function saveApiToken() {
-      localStorage.setItem('fii_pulse_brapi_token', document.getElementById('brapi-token-input').value.trim());
+      const val = document.getElementById('brapi-token-input').value.trim();
+      localStorage.setItem('fii_pulse_brapi_token', val);
       updateApiBadge();
       closeApiModal();
-      showToast('Token salvo com sucesso!');
+      showToast('Token salvo! Sincronizando carteira...');
+      syncAllPortfolioWithB3(true);
     }
     function updateApiBadge() {
-      const token = localStorage.getItem('fii_pulse_brapi_token');
-      document.getElementById('api-badge-label').textContent = token ? 'API B3 (Pro)' : 'API B3';
+      const token = (localStorage.getItem('fii_pulse_brapi_token') || '').trim();
+      document.getElementById('api-badge-label').textContent = token ? 'Token Ativo' : 'Configurar Token';
+      const banner = document.getElementById('no-token-banner');
+      if (!token) banner.classList.remove('hidden');
+      else banner.classList.add('hidden');
     }
 
-    async function syncAllPortfolioWithB3() {
+    async function syncAllPortfolioWithB3(manual = false) {
       const icon = document.getElementById('sync-icon');
       const btn = document.getElementById('sync-btn');
+      const badge = document.getElementById('live-status-badge');
       icon.classList.add('animate-spin');
       btn.disabled = true;
 
-      const token = localStorage.getItem('fii_pulse_brapi_token') || '';
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-      const tickers = Array.from(new Set([...portfolio.map(p => p.ticker)]));
+      const tickers = Array.from(new Set(portfolio.map(p => p.ticker)));
       let updatedCount = 0;
+      let failCount = 0;
 
       for (const t of tickers) {
         try {
-          const res = await fetch(`https://brapi.dev/api/quote/${t}?dividends=true`, { headers });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.results?.[0]) {
-              const item = data.results[0];
-              const fii = getFiiByTicker(t);
-              if (fii && item.regularMarketPrice > 0) {
-                fii.price = Number(item.regularMarketPrice);
-                const cashDivs = item.dividendsData?.cashDividends;
-                if (Array.isArray(cashDivs) && cashDivs.length > 0) {
-                  const sorted = [...cashDivs].sort((a, b) => new Date(b.paymentDate || b.approvedOn) - new Date(a.paymentDate || a.approvedOn));
-                  if (sorted[0]?.rate > 0) fii.div = Number(sorted[0].rate);
-                }
-                updatedCount++;
-              }
+          const liveData = await fetchTickerLiveFromBrapi(t);
+          const idx = fiiCatalog.findIndex(f => f.ticker === t);
+          if (idx >= 0) {
+            if (liveData.div === 0 && fiiCatalog[idx].div > 0) {
+              liveData.div = fiiCatalog[idx].div;
             }
+            fiiCatalog[idx] = liveData;
+          } else {
+            fiiCatalog.push(liveData);
           }
-        } catch(e) { console.warn("Erro ao atualizar", e); }
+          updatedCount++;
+          addLog("Sync B3", `${t} atualizado → Cotação: ${formatBRL(liveData.price)} | Div: ${formatBRL(liveData.div)}`);
+        } catch (err) {
+          failCount++;
+          addLog("Erro Sync", `${t}: ${err.message}`);
+        }
       }
 
       saveCatalog();
@@ -662,30 +739,53 @@
 
       icon.classList.remove('animate-spin');
       btn.disabled = false;
-      addLog("Sincronização B3", `${updatedCount} fundos atualizados com cotações e dividendos reais da B3.`);
-      showToast(`${updatedCount} FIIs atualizados com sucesso!`);
+
+      if (updatedCount > 0) {
+        badge.textContent = "B3 Atualizada";
+        badge.className = "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35";
+        document.getElementById('last-sync-text').textContent = `Última sincronização: ${new Date().toLocaleTimeString('pt-BR')}`;
+        if (manual) showToast(`${updatedCount} FII(s) atualizados com dados reais da B3!`);
+      } else if (failCount > 0 && manual) {
+        badge.textContent = "Erro na API";
+        badge.className = "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/35";
+        showToast("Não foi possível atualizar. Verifique seu Token na aba Logs.", "warning");
+      }
     }
 
-    function addSelectedToPortfolio() {
+    async function addSelectedToPortfolio() {
       const raw = document.getElementById('portfolio-search-input').value.trim().toUpperCase();
       if (!raw) return;
-      let fii = getFiiByTicker(raw);
-      const p = parseFloat(document.getElementById('portfolio-price').value) || 10;
-      const d = parseFloat(document.getElementById('portfolio-div').value) || 0.09;
+      const formatted = raw.endsWith('11') || raw.endsWith('11B') ? raw : `${raw}11`;
+      let fii = getFiiByTicker(formatted);
+      let p = parseFloat(document.getElementById('portfolio-price').value) || 0;
+      let d = parseFloat(document.getElementById('portfolio-div').value) || 0;
       const qty = parseInt(document.getElementById('portfolio-qty').value, 10) || 10;
 
-      if (!fii) {
-        fii = { ticker: raw, name: `Fundo ${raw}`, sector: "FII / B3", price: p, div: d, rg: "Adicionado manualmente." };
-        fiiCatalog.unshift(fii);
-        saveCatalog();
+      // Se o usuário digitou o ticker e clicou direto em "+" sem clicar em "Puxar API", busca agora
+      if (!fii || p === 0) {
+        try {
+          const live = await fetchTickerLiveFromBrapi(formatted);
+          fii = live;
+          p = live.price;
+          d = live.div;
+        } catch (e) {
+          fii = { ticker: formatted, name: `Fundo ${formatted}`, sector: "FII / B3", price: p, div: d, updatedAt: null };
+        }
+        const idx = fiiCatalog.findIndex(x => x.ticker === formatted);
+        if (idx >= 0) fiiCatalog[idx] = fii;
+        else fiiCatalog.unshift(fii);
+      } else {
+        if (p > 0) fii.price = p;
+        if (d > 0) fii.div = d;
       }
+      saveCatalog();
 
-      const existing = portfolio.find(x => x.ticker === fii.ticker);
+      const existing = portfolio.find(x => x.ticker === formatted);
       if (existing) existing.quotas += qty;
-      else portfolio.push({ ticker: fii.ticker, quotas: qty });
+      else portfolio.push({ ticker: formatted, quotas: qty });
       savePortfolio();
       renderAll();
-      showToast(`${qty} cotas de ${fii.ticker} adicionadas!`);
+      showToast(`${qty} cotas de ${formatted} adicionadas!`);
     }
 
     function updateQuotas(ticker, delta) {
@@ -699,12 +799,6 @@
 
     function removePortfolioItem(ticker) {
       portfolio = portfolio.filter(p => p.ticker !== ticker);
-      savePortfolio();
-      renderAll();
-    }
-
-    function resetDefaultPortfolio() {
-      portfolio = [{ ticker: "CPTS11", quotas: 150 }, { ticker: "SNAG11", quotas: 200 }, { ticker: "SNEL11", quotas: 100 }];
       savePortfolio();
       renderAll();
     }
@@ -751,7 +845,7 @@
       if (!item) return;
       let fii = getFiiByTicker(item.ticker);
       if (!fii) {
-        fii = { ticker: item.ticker, name: `Fundo ${item.ticker}`, sector: "FII / B3", price: item.price, div: item.div, rg: "Promovido." };
+        fii = { ticker: item.ticker, name: `Fundo ${item.ticker}`, sector: "FII / B3", price: item.price, div: item.div, updatedAt: new Date().toISOString() };
         fiiCatalog.unshift(fii);
         saveCatalog();
       }
@@ -784,7 +878,7 @@
       const newDiv = parseFloat(valueMatch[1].replace(',', '.'));
       let fii = getFiiByTicker(ticker);
       if (fii) fii.div = newDiv;
-      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "FII / B3", price: newDiv * 100, div: newDiv, rg: text.slice(0, 100) }; fiiCatalog.unshift(fii); }
+      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "FII / B3", price: 0, div: newDiv, updatedAt: new Date().toISOString() }; fiiCatalog.unshift(fii); }
       saveCatalog();
       closeParserModal();
       renderAll();
@@ -798,22 +892,28 @@
       tbody.innerHTML = portfolio.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Carteira vazia.</td></tr>` : '';
 
       portfolio.forEach(pos => {
-        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "FII / B3", price: 10, div: 0.08 };
+        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "FII / B3", price: 0, div: 0 };
         const val = pos.quotas * fii.price;
         const monthly = pos.quotas * fii.div;
-        const magic = fii.div > 0 ? Math.ceil(fii.price / fii.div) : 0;
+        const magic = fii.div > 0 && fii.price > 0 ? Math.ceil(fii.price / fii.div) : 0;
         const pct = magic > 0 ? Math.min(100, Math.round((pos.quotas / magic) * 100)) : 0;
 
         totalValue += val; totalMonthly += monthly; totalQ += pos.quotas;
-        sectorMap[fii.sector] = (sectorMap[fii.sector] || 0) + val;
+        if (val > 0) sectorMap[fii.sector] = (sectorMap[fii.sector] || 0) + val;
+
+        const priceDisplay = fii.price > 0 ? formatBRL(fii.price) : `<span class="text-amber-400 text-xs">Pendente API</span>`;
+        const divDisplay = fii.div > 0 ? formatBRL(fii.div) : `<span class="text-slate-500 text-xs">R$ 0,00</span>`;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition";
         tr.innerHTML = `
-          <td class="py-3 px-4"><div class="font-bold text-white">${fii.ticker}</div><div class="text-[11px] text-slate-400">${fii.name}</div></td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-white">${fii.ticker}</div>
+            <div class="text-[11px] text-slate-400">${fii.name}</div>
+          </td>
           <td class="py-3 px-3 text-right font-medium text-slate-200">${pos.quotas}</td>
-          <td class="py-3 px-3 text-right text-slate-300">${formatBRL(fii.price)}</td>
-          <td class="py-3 px-3 text-right text-emerald-400 font-medium">${formatBRL(fii.div)}</td>
+          <td class="py-3 px-3 text-right text-slate-300">${priceDisplay}</td>
+          <td class="py-3 px-3 text-right text-emerald-400 font-medium">${divDisplay}</td>
           <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatBRL(monthly)}</td>
           <td class="py-3 px-4">
             <div class="flex items-center justify-between text-[11px] mb-1"><span class="text-slate-300">${pos.quotas}/${magic}</span><span class="${pct>=100?'text-emerald-400 font-bold':'text-slate-400'}">${pct}%</span></div>
@@ -856,7 +956,7 @@
         data: { labels, datasets: [{ data: values.length ? values : [1], backgroundColor: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
         options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } }
       });
-      document.getElementById('sector-legend').innerHTML = labels.map((l, i) => `<div class="flex items-center justify-between"><span class="text-slate-300">${l}</span><span class="font-semibold text-white">${((sectorMap[l]/totalValue)*100).toFixed(1)}%</span></div>`).join('');
+      document.getElementById('sector-legend').innerHTML = labels.map(l => `<div class="flex items-center justify-between"><span class="text-slate-300">${l}</span><span class="font-semibold text-white">${totalValue > 0 ? ((sectorMap[l]/totalValue)*100).toFixed(1) : 0}%</span></div>`).join('');
     }
 
     function renderSandboxBasket() {
@@ -887,7 +987,9 @@
     }
 
     function renderLogs() {
-      document.getElementById('rg-feed-list').innerHTML = rgLogs.map(l => `<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between text-xs"><div><span class="text-emerald-400 font-semibold mr-2">[${l.source}]</span><span class="text-slate-200">${l.message}</span></div><span class="text-slate-500">${l.time}</span></div>`).join('');
+      document.getElementById('rg-feed-list').innerHTML = rgLogs.length === 0
+        ? `<div class="text-xs text-slate-400">Nenhum log registrado ainda.</div>`
+        : rgLogs.map(l => `<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between gap-2 text-xs"><div><span class="text-emerald-400 font-semibold mr-2">[${l.source}]</span><span class="text-slate-200">${l.message}</span></div><span class="text-slate-500 shrink-0">${l.time}</span></div>`).join('');
     }
 
     function getSnowballData() {
