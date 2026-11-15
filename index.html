@@ -27,24 +27,20 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg font-bold tracking-tight text-white">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Live & Manual</span>
+            <span id="live-status-badge" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Direto (Sem Token)</span>
           </div>
-          <p class="text-xs text-slate-400">Simulador de Proventos & Relatórios Gerenciais</p>
+          <p id="last-sync-text" class="text-xs text-slate-400">Cotações & Proventos Reais da Bolsa</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-        <button onclick="openApiModal()" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300 transition">
-          <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span>Token B3</span>
-        </button>
         <button onclick="openParserModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition">
           <i data-lucide="file-text" class="w-3.5 h-3.5 text-sky-400"></i>
           <span class="hidden sm:inline">Ler RG (IA)</span>
         </button>
         <button id="sync-btn" onclick="syncAllPortfolioWithB3(true)" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition">
           <i id="sync-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>Atualizar Cotações</span>
+          <span>Sincronizar B3</span>
         </button>
       </div>
     </div>
@@ -88,10 +84,10 @@
       <div class="glass-card rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Buscar FII & Definir Provento</h2>
-            <p class="text-xs text-slate-400">A cotação é puxada ao vivo da B3. Você define o dividendo (ou usa o leitor de RG).</p>
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Buscar & Adicionar FII da B3</h2>
+            <p class="text-xs text-slate-400">Busca gratuita e ilimitada de cotação e último dividendo de qualquer FII (SNAG11, SNEL11, CPTS11, etc.).</p>
           </div>
-          <button onclick="resetAllCache()" class="text-[11px] px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 self-start">Limpar Cache</button>
+          <button onclick="resetAllCache()" class="text-[11px] px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 self-start">Resetar Dados</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
@@ -100,11 +96,11 @@
             <div class="flex gap-2">
               <div class="relative flex-1">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="portfolio-search-input" placeholder="Ex: SNAG11, SNEL11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault(); fetchAndSelectFromB3('portfolio', this.value);}" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
+                <input type="text" id="portfolio-search-input" placeholder="Ex: SNAG11, SNEL11, CPTS11..." autocomplete="off" oninput="handleSearchInput('portfolio', this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault(); fetchAndSelectFromB3('portfolio', this.value);}" class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
                 <button onclick="clearSearch('portfolio')" id="portfolio-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
               </div>
               <button onclick="fetchAndSelectFromB3('portfolio', document.getElementById('portfolio-search-input').value)" class="px-3.5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap">
-                <i data-lucide="cloud-download" class="w-4 h-4"></i> Puxar B3
+                <i data-lucide="cloud-download" class="w-4 h-4"></i> Buscar B3
               </button>
             </div>
             <div id="portfolio-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-72 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
@@ -144,7 +140,7 @@
         <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden flex flex-col">
           <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <h3 class="font-bold text-sm text-white flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> Ativos na Carteira & Magic Number</h3>
-            <span class="text-[11px] text-slate-400">Cotações ao vivo</span>
+            <span class="text-[11px] text-slate-400">Atualizado em tempo real</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -183,7 +179,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i> Simulador Avulso</h2>
-            <p class="text-xs text-slate-400">Teste fundos buscando cotação da B3.</p>
+            <p class="text-xs text-slate-400">Busque qualquer FII da B3 para simular rendimentos sem comprar.</p>
           </div>
           <span class="text-[11px] px-2.5 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 self-start">Isolado</span>
         </div>
@@ -221,7 +217,7 @@
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Div. (R$)</label>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Div. B3 (R$)</label>
             <input type="number" step="0.001" id="sandbox-div" oninput="recalcSandbox()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500" />
           </div>
         </div>
@@ -320,7 +316,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-base font-bold text-white">Logs & Diagnóstico</h2>
-            <p class="text-xs text-slate-400">Histórico de requisições de cotação da B3.</p>
+            <p class="text-xs text-slate-400">Histórico de atualizações diretas da B3.</p>
           </div>
           <button onclick="openParserModal()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5"><i data-lucide="file-search" class="w-4 h-4"></i> Colar Relatório</button>
         </div>
@@ -328,25 +324,6 @@
       </div>
     </section>
   </main>
-
-  <!-- MODAL API -->
-  <div id="api-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl max-w-md w-full p-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="font-bold text-base text-white flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-amber-400"></i> Token brapi.dev</h3>
-        <button onclick="closeApiModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-      <p class="text-xs text-slate-300 leading-relaxed">Insira seu token para puxar cotações atualizadas em tempo real.</p>
-      <div>
-        <label class="block text-xs font-medium text-slate-300 mb-1">Token</label>
-        <input type="text" id="brapi-token-input" placeholder="Cole o token aqui" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500" />
-      </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-medium text-slate-300">Cancelar</button>
-        <button onclick="saveApiToken()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Salvar</button>
-      </div>
-    </div>
-  </div>
 
   <!-- MODAL PARSER -->
   <div id="parser-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
@@ -365,7 +342,7 @@
   </div>
 
   <script>
-    const STORAGE_VERSION = 'v8';
+    const STORAGE_VERSION = 'v9';
     let fiiCatalog = [];
     let portfolio = [];
     let sandboxBasket = [];
@@ -374,7 +351,7 @@
     let snowballChartInstance = null;
 
     function init() {
-      ['v5', 'v6', 'v7'].forEach(oldV => {
+      ['v5', 'v6', 'v7', 'v8'].forEach(oldV => {
         localStorage.removeItem(`fii_pulse_catalog_${oldV}`);
         localStorage.removeItem(`fii_pulse_portfolio_${oldV}`);
       });
@@ -384,9 +361,9 @@
         fiiCatalog = JSON.parse(savedCatalog);
       } else {
         fiiCatalog = [
-          { ticker: "CPTS11", name: "Capitânia Securities II", sector: "Papel / CRI", price: 6.88, div: 0.09 },
-          { ticker: "SNAG11", name: "Suno Agro", sector: "Fiagro", price: 9.57, div: 0.12 },
-          { ticker: "SNEL11", name: "Suno Energias Limpas", sector: "Híbrido", price: 7.24, div: 0.05 }
+          { ticker: "CPTS11", name: "Capitânia Securities II", sector: "FII / B3", price: 0, div: 0 },
+          { ticker: "SNAG11", name: "Suno Agro", sector: "Fiagro / B3", price: 0, div: 0 },
+          { ticker: "SNEL11", name: "Suno Energias Limpas", sector: "FII / B3", price: 0, div: 0 }
         ];
         saveCatalog();
       }
@@ -477,25 +454,59 @@
       if (tab === 'snowball') updateSnowball();
     }
 
-    // BUSCA APENAS COTAÇÃO (LIVRE NO PLANO GRATUITO)
-    async function fetchTickerPriceFromBrapi(ticker) {
+    // CONSULTA DIRETA E GRATUITA DE COTAÇÃO E DIVIDENDOS DA B3 (.SA)
+    async function fetchTickerFromB3Free(ticker) {
       const formatted = ticker.toUpperCase().trim();
-      const token = (localStorage.getItem('fii_pulse_brapi_token') || '').trim();
-      const tokenParam = token ? `?token=${encodeURIComponent(token)}` : '';
+      const yahooSymbol = `${formatted}.SA`;
+      const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?range=3mo&interval=1d&events=div`;
 
-      const quoteUrl = `https://brapi.dev/api/quote/${formatted}${tokenParam}`;
-      const resQuote = await fetch(quoteUrl);
-      if (!resQuote.ok) {
-        throw new Error(`HTTP ${resQuote.status} em quote/${formatted}`);
+      // Tenta múltiplos proxies públicos caso um oscile
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(yahooUrl)}`
+      ];
+
+      let data = null;
+      let lastErr = null;
+
+      for (const proxyUrl of proxies) {
+        try {
+          const res = await fetch(proxyUrl);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const json = await res.json();
+          if (json?.chart?.result?.[0]) {
+            data = json.chart.result[0];
+            break;
+          }
+        } catch (err) {
+          lastErr = err;
+        }
       }
-      const dataQuote = await resQuote.json();
-      const item = dataQuote?.results?.[0];
-      if (!item) throw new Error(`Ticker ${formatted} não encontrado.`);
+
+      if (!data) {
+        throw new Error(`Não foi possível obter ${formatted} (${lastErr?.message || 'sem resposta'})`);
+      }
+
+      const meta = data.meta || {};
+      const price = Number(meta.regularMarketPrice || 0);
+      const name = meta.shortName || meta.longName || `Fundo ${formatted}`;
+
+      // Extrai o último dividendo real pago nos últimos 3 meses
+      let lastDiv = 0;
+      const divEvents = data.events?.dividends;
+      if (divEvents) {
+        const divArray = Object.values(divEvents).sort((a, b) => b.date - a.date);
+        if (divArray.length > 0 && divArray[0].amount > 0) {
+          lastDiv = Number(divArray[0].amount);
+        }
+      }
 
       return {
-        price: Number(item.regularMarketPrice || 0),
-        name: item.shortName || item.longName || `Fundo ${formatted}`,
-        sector: item.sector || "FII / B3"
+        ticker: formatted,
+        name: name.replace('.SA', ''),
+        sector: "FII / B3",
+        price,
+        div: lastDiv
       };
     }
 
@@ -521,9 +532,9 @@
           <div onclick="fetchAndSelectFromB3('${context}', '${formatted}')" class="dropdown-item p-3 bg-emerald-500/15 hover:bg-emerald-500/25 cursor-pointer flex items-center justify-between transition">
             <div>
               <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                <i data-lucide="cloud-download" class="w-4 h-4"></i> Puxar cotação de ${formatted} na B3
+                <i data-lucide="cloud-download" class="w-4 h-4"></i> Buscar ${formatted} ao vivo na B3
               </div>
-              <div class="text-[11px] text-slate-300">Atualiza preço mantendo seu dividendo</div>
+              <div class="text-[11px] text-slate-300">Cotação + último dividendo pago</div>
             </div>
           </div>
         `;
@@ -564,26 +575,24 @@
       if (!clean) return;
       const formatted = clean.endsWith('11') || clean.endsWith('11B') ? clean : `${clean}11`;
 
-      showToast(`Buscando preço de ${formatted} na B3...`, 'info');
+      showToast(`Buscando ${formatted} na B3...`, 'info');
       try {
-        const live = await fetchTickerPriceFromBrapi(formatted);
-        let existing = getFiiByTicker(formatted);
-        if (existing) {
-          existing.price = live.price;
-          existing.name = live.name;
-          existing.sector = live.sector;
+        const live = await fetchTickerFromB3Free(formatted);
+        let idx = fiiCatalog.findIndex(f => f.ticker === formatted);
+        if (idx >= 0) {
+          if (live.div === 0 && fiiCatalog[idx].div > 0) live.div = fiiCatalog[idx].div;
+          fiiCatalog[idx] = live;
         } else {
-          existing = { ticker: formatted, name: live.name, sector: live.sector, price: live.price, div: 0.09 };
-          fiiCatalog.unshift(existing);
+          fiiCatalog.unshift(live);
         }
         saveCatalog();
-        selectFii(context, existing);
+        selectFii(context, live);
         renderAll();
-        addLog("Cotação B3", `${formatted}: R$ ${live.price.toFixed(2)}`);
-        showToast(`${formatted} cotação atualizada!`);
+        addLog("B3 Live", `${formatted}: Cotação ${formatBRL(live.price)} | Div ${formatBRL(live.div)}`);
+        showToast(`${formatted} atualizado: ${formatBRL(live.price)}`);
       } catch (err) {
-        addLog("Erro Preço", `${formatted}: ${err.message}`);
-        showToast(`Erro ao buscar ${formatted}.`, 'warning');
+        addLog("Erro B3", err.message);
+        showToast(`Não foi possível buscar ${formatted}.`, 'warning');
       }
     }
 
@@ -600,25 +609,13 @@
         document.getElementById('sel-badge-ticker').textContent = fii.ticker;
         document.getElementById('sel-badge-name').textContent = fii.name;
         document.getElementById('sel-badge-sector').textContent = `• ${fii.sector}`;
-        document.getElementById('sel-badge-rg').textContent = `Preço atualizado da B3`;
+        document.getElementById('sel-badge-rg').textContent = `Dados reais da B3`;
         document.getElementById('portfolio-selected-info').classList.remove('hidden');
       } else {
         document.getElementById('sandbox-price').value = fii.price ? fii.price.toFixed(2) : '';
         document.getElementById('sandbox-div').value = fii.div ? fii.div.toFixed(3) : '';
         recalcSandbox();
       }
-    }
-
-    function openApiModal() {
-      document.getElementById('brapi-token-input').value = localStorage.getItem('fii_pulse_brapi_token') || '';
-      document.getElementById('api-modal').classList.remove('hidden');
-    }
-    function closeApiModal() { document.getElementById('api-modal').classList.add('hidden'); }
-    function saveApiToken() {
-      localStorage.setItem('fii_pulse_brapi_token', document.getElementById('brapi-token-input').value.trim());
-      closeApiModal();
-      showToast('Token salvo! Atualizando cotações...');
-      syncAllPortfolioWithB3(true);
     }
 
     async function syncAllPortfolioWithB3(manual = false) {
@@ -632,16 +629,16 @@
 
       for (const t of tickers) {
         try {
-          const live = await fetchTickerPriceFromBrapi(t);
+          const live = await fetchTickerFromB3Free(t);
           let idx = fiiCatalog.findIndex(f => f.ticker === t);
           if (idx >= 0) {
-            fiiCatalog[idx].price = live.price;
-            fiiCatalog[idx].name = live.name;
+            if (live.div === 0 && fiiCatalog[idx].div > 0) live.div = fiiCatalog[idx].div;
+            fiiCatalog[idx] = live;
           } else {
-            fiiCatalog.push({ ticker: t, name: live.name, sector: live.sector, price: live.price, div: 0.09 });
+            fiiCatalog.push(live);
           }
           updated++;
-          addLog("Sync Preço", `${t}: R$ ${live.price.toFixed(2)}`);
+          addLog("Sync B3", `${t} → Cotação: ${formatBRL(live.price)} | Div: ${formatBRL(live.div)}`);
         } catch (e) {
           addLog("Erro Sync", `${t}: ${e.message}`);
         }
@@ -651,7 +648,10 @@
       renderAll();
       icon.classList.remove('animate-spin');
       btn.disabled = false;
-      if (manual) showToast(`${updated} cotações atualizadas da B3!`);
+      if (updated > 0) {
+        document.getElementById('last-sync-text').textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}`;
+        if (manual) showToast(`${updated} FIIs atualizados com sucesso!`);
+      }
     }
 
     async function addSelectedToPortfolio() {
@@ -660,36 +660,30 @@
       const formatted = raw.endsWith('11') || raw.endsWith('11B') ? raw : `${raw}11`;
       let fii = getFiiByTicker(formatted);
       let p = parseFloat(document.getElementById('portfolio-price').value) || 0;
-      let d = parseFloat(document.getElementById('portfolio-div').value) || 0.09;
+      let d = parseFloat(document.getElementById('portfolio-div').value) || 0;
       const qty = parseInt(document.getElementById('portfolio-qty').value, 10) || 10;
 
       if (!fii || p === 0) {
         try {
-          const live = await fetchTickerPriceFromBrapi(formatted);
-          p = live.price;
-          fii = { ticker: formatted, name: live.name, sector: live.sector, price: p, div: d };
+          const live = await fetchTickerFromB3Free(formatted);
+          fii = live;
+          if (p > 0) fii.price = p;
+          if (d > 0) fii.div = d;
         } catch (e) {
-          fii = { ticker: formatted, name: `Fundo ${formatted}`, sector: "FII / B3", price: p || 10.00, div: d };
+          fii = { ticker: formatted, name: `Fundo ${formatted}`, sector: "FII / B3", price: p, div: d };
         }
         const idx = fiiCatalog.findIndex(x => x.ticker === formatted);
-        if (idx >= 0) {
-          fiiCatalog[idx].price = fii.price;
-          if (d > 0) fiiCatalog[idx].div = d;
-        } else {
-          fiiCatalog.unshift(fii);
-        }
+        if (idx >= 0) fiiCatalog[idx] = fii;
+        else fiiCatalog.unshift(fii);
       } else {
-        fii.price = p;
-        fii.div = d;
+        if (p > 0) fii.price = p;
+        if (d > 0) fii.div = d;
       }
       saveCatalog();
 
       const existing = portfolio.find(x => x.ticker === formatted);
-      if (existing) {
-        existing.quotas += qty;
-      } else {
-        portfolio.push({ ticker: formatted, quotas: qty });
-      }
+      if (existing) existing.quotas += qty;
+      else portfolio.push({ ticker: formatted, quotas: qty });
       savePortfolio();
       renderAll();
       showToast(`${qty} cotas de ${formatted} adicionadas!`);
@@ -785,7 +779,7 @@
       const newDiv = parseFloat(valueMatch[1].replace(',', '.'));
       let fii = getFiiByTicker(ticker);
       if (fii) fii.div = newDiv;
-      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "FII / B3", price: 10.00, div: newDiv }; fiiCatalog.unshift(fii); }
+      else { fii = { ticker, name: `Fundo ${ticker}`, sector: "FII / B3", price: 0, div: newDiv }; fiiCatalog.unshift(fii); }
       saveCatalog();
       closeParserModal();
       renderAll();
@@ -799,14 +793,16 @@
       tbody.innerHTML = portfolio.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Carteira vazia.</td></tr>` : '';
 
       portfolio.forEach(pos => {
-        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "FII / B3", price: 10, div: 0.09 };
+        const fii = getFiiByTicker(pos.ticker) || { ticker: pos.ticker, name: pos.ticker, sector: "FII / B3", price: 0, div: 0 };
         const val = pos.quotas * fii.price;
         const monthly = pos.quotas * fii.div;
         const magic = fii.div > 0 && fii.price > 0 ? Math.ceil(fii.price / fii.div) : 0;
         const pct = magic > 0 ? Math.min(100, Math.round((pos.quotas / magic) * 100)) : 0;
 
         totalValue += val; totalMonthly += monthly; totalQ += pos.quotas;
-        sectorMap[fii.sector] = (sectorMap[fii.sector] || 0) + val;
+        if (val > 0) sectorMap[fii.sector] = (sectorMap[fii.sector] || 0) + val;
+
+        const priceDisplay = fii.price > 0 ? formatBRL(fii.price) : `<span class="text-amber-400 text-xs">Sincronizando...</span>`;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition";
@@ -816,7 +812,7 @@
             <div class="text-[11px] text-slate-400">${fii.name}</div>
           </td>
           <td class="py-3 px-3 text-right font-medium text-slate-200">${pos.quotas}</td>
-          <td class="py-3 px-3 text-right text-slate-300">${formatBRL(fii.price)}</td>
+          <td class="py-3 px-3 text-right text-slate-300">${priceDisplay}</td>
           <td class="py-3 px-3 text-right text-emerald-400 font-medium">${formatBRL(fii.div)}</td>
           <td class="py-3 px-3 text-right font-bold text-emerald-400">${formatBRL(monthly)}</td>
           <td class="py-3 px-4">
