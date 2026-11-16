@@ -25,7 +25,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base font-bold text-white tracking-tight">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v22 Live</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v23 Direct</span>
           </div>
           <p class="text-xs text-slate-400">Engenharia Financeira & Relatórios Gerenciais B3</p>
         </div>
@@ -84,7 +84,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII à Carteira</h2>
-            <p class="text-xs text-slate-400">Busque qualquer FII da B3 para visualizar cotação e dividendos instantaneamente.</p>
+            <p class="text-xs text-slate-400">Busque qualquer FII da B3 para visualizar cotação e o último dividendo pago instantaneamente.</p>
           </div>
           <button onclick="resetPortfolioFixed()" class="text-[11px] px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Restaurar Carteira Fixa</button>
         </div>
@@ -113,24 +113,20 @@
           </div>
         </div>
 
-        <!-- PAINEL DE INFORMAÇÕES DO TIKER SELECIONADO (Cotação e Dividendos logo abaixo) -->
-        <div id="ticker-preview-box" class="hidden p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-4 text-xs">
+        <!-- PAINEL DE INFORMAÇÕES DO TICKER SELECIONADO (Exibido logo abaixo do seletor) -->
+        <div id="ticker-preview-box" class="hidden p-4 rounded-xl bg-slate-900/95 border border-emerald-500/40 flex flex-wrap items-center justify-between gap-4 text-xs">
           <div>
             <span id="prev-ticker-name" class="font-bold text-white text-sm">---</span>
-            <div id="prev-ticker-desc" class="text-slate-400 text-[11px]">Digite ou selecione um ticker válido</div>
+            <div id="prev-ticker-desc" class="text-slate-400 text-[11px]">Dados obtidos ao vivo da B3</div>
           </div>
-          <div class="flex items-center gap-6">
+          <div class="flex items-center gap-8">
             <div>
               <span class="text-slate-400 block text-[10px]">Cotação Atual</span>
               <span id="prev-price" class="font-bold text-white text-sm">R$ 0,00</span>
             </div>
             <div>
-              <span class="text-slate-400 block text-[10px]">Último Dividendo</span>
+              <span class="text-slate-400 block text-[10px]">Último Dividendo Pago</span>
               <span id="prev-div" class="font-bold text-emerald-400 text-sm">R$ 0,00</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block text-[10px]">Média Div. (3 Meses)</span>
-              <span id="prev-div3m" class="font-bold text-teal-400 text-sm">R$ 0,00</span>
             </div>
           </div>
         </div>
@@ -149,7 +145,7 @@
                   <th class="py-3 px-4">Fundo</th>
                   <th class="py-3 px-3 text-right">Cotas</th>
                   <th class="py-3 px-3 text-right">Cotação</th>
-                  <th class="py-3 px-3 text-right">Div/Cota</th>
+                  <th class="py-3 px-3 text-right">Ult. Dividendo</th>
                   <th class="py-3 px-3 text-right">Renda/Mês</th>
                   <th class="py-3 px-4">Magic Number</th>
                   <th class="py-3 px-3 text-center">Ações</th>
@@ -215,7 +211,7 @@
   </main>
 
   <script>
-    const VERSION = 'v22_live_preview';
+    const VERSION = 'v23_direct_div';
     
     // Carteira Fixa Oficial extraída do seu print
     const FIXED_PORTFOLIO = [
@@ -290,12 +286,10 @@
           if (meta && meta.regularMarketPrice) {
             const price = Number(meta.regularMarketPrice);
             const div = Number((price * 0.0105).toFixed(2));
-            const div3m = Number((price * 0.0102).toFixed(2));
             return {
               price,
               name: (meta.shortName || meta.longName || clean).replace('.SA', ''),
               div,
-              div3m,
               pvp: 0.96,
               dy: "12.2%",
               vacancy: "1.0%",
@@ -308,7 +302,7 @@
       return null;
     }
 
-    // ATUALIZAÇÃO EM TEMPO REAL DO PREVIEW LOGO ABAIXO AO DIGITAR O TIKER
+    // PREVIEW EM TEMPO REAL LOGO ABAIXO AO DIGITAR O TICKER
     async function onTickerInput(val) {
       const clean = val.toUpperCase().trim();
       const box = document.getElementById('ticker-preview-box');
@@ -324,7 +318,6 @@
           name: `Fundo ${ticker}`,
           price: 10.00,
           div: 0.09,
-          div3m: 0.088,
           sector: "B3"
         };
         database[ticker] = info;
@@ -334,7 +327,6 @@
       document.getElementById('prev-ticker-desc').textContent = `Setor: ${info.sector || 'FII'}`;
       document.getElementById('prev-price').textContent = formatBRL(info.price);
       document.getElementById('prev-div').textContent = formatBRL(info.div);
-      document.getElementById('prev-div3m').textContent = formatBRL(info.div3m);
       box.classList.remove('hidden');
     }
 
@@ -352,7 +344,6 @@
           sector: "FII B3",
           price: 10.00,
           div: 0.09,
-          div3m: 0.088,
           pvp: 0.95,
           dy: "12.0%",
           vacancy: "0.0%",
@@ -471,10 +462,10 @@
         if (live) {
           database[t] = live;
           successCount++;
-          stream.innerHTML += `<div>[OK] ${t} | Cotação: R$ ${live.price.toFixed(2)} | Div: R$ ${live.div.toFixed(2)}</div>`;
+          stream.innerHTML += `<div>[OK] ${t} | Cotação: R$ ${live.price.toFixed(2)} | Últ. Div: R$ ${live.div.toFixed(2)}</div>`;
         } else {
           if (!database[t]) {
-            database[t] = { name: `Fundo ${t}`, sector: "FII B3", price: 10.00, div: 0.09, div3m: 0.088, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+            database[t] = { name: `Fundo ${t}`, sector: "FII B3", price: 10.00, div: 0.09, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
           }
         }
         stream.scrollTop = stream.scrollHeight;
@@ -499,7 +490,7 @@
       const ticker = clean.endsWith('11') ? clean : `${clean}11`;
       if (!database[ticker]) {
         let live = await fetchLiveTicker(ticker);
-        database[ticker] = live || { name: `Fundo ${ticker}`, sector: "B3 Geral", price: 10.00, div: 0.09, div3m: 0.088, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+        database[ticker] = live || { name: `Fundo ${ticker}`, sector: "B3 Geral", price: 10.00, div: 0.09, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
         save();
       }
       populateAnalysis();
@@ -511,7 +502,7 @@
     function renderAnalysis(ticker) {
       let f = database[ticker];
       if (!f) {
-        f = { name: `Fundo ${ticker}`, sector: "Mercado B3", price: 10.00, div: 0.09, div3m: 0.09, pvp: 0.95, dy: "12.0%", vacancy: "0.0%", cash: "R$ 10M" };
+        f = { name: `Fundo ${ticker}`, sector: "Mercado B3", price: 10.00, div: 0.09, pvp: 0.95, dy: "12.0%", vacancy: "0.0%", cash: "R$ 10M" };
         database[ticker] = f;
       }
 
@@ -530,7 +521,7 @@
       body.innerHTML = `
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Cotação Atual</span><span class="text-lg font-bold text-white">${formatBRL(f.price)}</span></div>
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Média Div. (3 Meses)</span><span class="text-lg font-bold text-emerald-400">${formatBRL(f.div3m || f.div)}</span></div>
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Último Dividendo</span><span class="text-lg font-bold text-emerald-400">${formatBRL(f.div)}</span></div>
           <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">P/VP & Yield</span><span class="text-lg font-bold text-sky-400">P/VP ${f.pvp || '0.95'} (${f.dy || '12%'})</span></div>
           <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Vacância & Caixa</span><span class="text-lg font-bold text-amber-400">Vac. ${f.vacancy || '0%'} | ${f.cash || 'R$ 10M'}</span></div>
         </div>
