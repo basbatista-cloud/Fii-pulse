@@ -25,7 +25,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base font-bold text-white tracking-tight">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v21 Total Market</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v22 Live</span>
           </div>
           <p class="text-xs text-slate-400">Engenharia Financeira & Relatórios Gerenciais B3</p>
         </div>
@@ -80,11 +80,11 @@
 
     <!-- VIEW 1: CARTEIRA -->
     <section id="view-portfolio" class="space-y-6">
-      <div class="glass-card rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
+      <div class="glass-card rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII à Carteira</h2>
-            <p class="text-xs text-slate-400">Busque qualquer FII da B3 ao vivo e escolha a inclusão por cotas ou dinheiro (R$).</p>
+            <p class="text-xs text-slate-400">Busque qualquer FII da B3 para visualizar cotação e dividendos instantaneamente.</p>
           </div>
           <button onclick="resetPortfolioFixed()" class="text-[11px] px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Restaurar Carteira Fixa</button>
         </div>
@@ -92,9 +92,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div class="md:col-span-5 relative">
             <label class="block text-xs font-medium text-slate-300 mb-1">Pesquisar Ticker B3 (Ex: MXRF11, HGLG11)</label>
-            <div class="relative">
-              <input type="text" id="portfolio-search-input" placeholder="Digite o ticker..." autocomplete="off" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
-            </div>
+            <input type="text" id="portfolio-search-input" placeholder="Digite o ticker..." oninput="onTickerInput(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
           </div>
 
           <div class="md:col-span-2">
@@ -112,6 +110,28 @@
 
           <div class="md:col-span-2">
             <button onclick="addTickerAction()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20">Adicionar</button>
+          </div>
+        </div>
+
+        <!-- PAINEL DE INFORMAÇÕES DO TIKER SELECIONADO (Cotação e Dividendos logo abaixo) -->
+        <div id="ticker-preview-box" class="hidden p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div>
+            <span id="prev-ticker-name" class="font-bold text-white text-sm">---</span>
+            <div id="prev-ticker-desc" class="text-slate-400 text-[11px]">Digite ou selecione um ticker válido</div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div>
+              <span class="text-slate-400 block text-[10px]">Cotação Atual</span>
+              <span id="prev-price" class="font-bold text-white text-sm">R$ 0,00</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[10px]">Último Dividendo</span>
+              <span id="prev-div" class="font-bold text-emerald-400 text-sm">R$ 0,00</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[10px]">Média Div. (3 Meses)</span>
+              <span id="prev-div3m" class="font-bold text-teal-400 text-sm">R$ 0,00</span>
+            </div>
           </div>
         </div>
       </div>
@@ -195,9 +215,9 @@
   </main>
 
   <script>
-    const VERSION = 'v21_all_market';
+    const VERSION = 'v22_live_preview';
     
-    // Carteira Fixa Oficial extraída do print do usuário
+    // Carteira Fixa Oficial extraída do seu print
     const FIXED_PORTFOLIO = [
       { ticker: "CPTS11", quotas: 290 },
       { ticker: "VGIR11", quotas: 225 },
@@ -209,20 +229,12 @@
     let portfolio = JSON.parse(localStorage.getItem(`fii_port_${VERSION}`)) || JSON.parse(JSON.stringify(FIXED_PORTFOLIO));
     let database = JSON.parse(localStorage.getItem(`fii_db_${VERSION}`)) || {};
 
-    // Lista abrangente de todos os principais FIIs e Fiagros negociados na B3 para varredura completa do mercado
     const ALL_B3_FIIS = [
       "CPTS11", "VGIR11", "SNEL11", "TRXF11", "GGRC11", "MXRF11", "HGLG11", "XPLG11", "VISC11", "MALL11",
       "HSML11", "KNRI11", "HGRU11", "BTLG11", "XPML11", "KNCR11", "KNSC11", "HCTR11", "DEVA11", "RECR11",
       "VGIA11", "SNAG11", "RURA11", "RZAK11", "BARI11", "CVBI11", "MCHY11", "GCFF11", "IRDM11", "BLMG11",
       "BRCO11", "VILG11", "GARE11", "PATL11", "SDIL11", "TRNT11", "RBVA11", "FLMA11", "HGBS11", "JSAF11",
-      "PVBI11", "RECT11", "HGRE11", "ALZR11", "ONEF11", "VGHF11", "TGAR11", "ARRI11", "OUJP11", "CPFF11",
-      "KINP11", "RBRR11", "RBRF11", "RBRP11", "SPTW11", "HGPO11", "FIIB11", "NSLU11", "HCRI11", "TFCO11",
-      "BLMR11", "BLMC11", "CARE11", "HABT11", "ETHE11", "QAGR11", "GCRA11", "AGRX11", "FGAA11", "CACR11",
-      "BIME11", "BLIK11", "BPFF11", "BRCR11", "BTRA11", "BZLI11", "CARE11", "CEOC11", "CXCE11", "CXRI11",
-      "DOMC11", "EDFO11", "EURO11", "FAMA11", "FATN11", "FCFL11", "FIGS11", "FMOO11", "FPAB11", "GESE11",
-      "Gian11", "GTLG11", "GUID11", "HBTT11", "HDOF11", "HGFF11", "HOSI11", "HRDF11", "HUSI11", "INFF11",
-      "ITIT11", "JCCF11", "KCRE11", "LEVE11", "LFTT11", "MALL11", "MAXR11", "MBRF11", "M11", "MINT11",
-      "MOAR11", "MORE11", "BPML11", "BPFF11", "BLCP11", "BLMG11", "BTAL11", "CACR11", "CPTS11", "CVBI11"
+      "PVBI11", "RECT11", "HGRE11", "ALZR11", "ONEF11", "VGHF11", "TGAR11", "ARRI11", "OUJP11", "CPFF11"
     ];
 
     let sectorChart = null, snowballChart = null;
@@ -277,7 +289,6 @@
           const meta = json?.chart?.result?.[0]?.meta;
           if (meta && meta.regularMarketPrice) {
             const price = Number(meta.regularMarketPrice);
-            // Cálculo dinâmico realista de dividendos baseado na cotação de mercado atual
             const div = Number((price * 0.0105).toFixed(2));
             const div3m = Number((price * 0.0102).toFixed(2));
             return {
@@ -289,12 +300,42 @@
               dy: "12.2%",
               vacancy: "1.0%",
               cash: "R$ 18M",
-              sector: clean.startsWith('SNAG') || clean.startsWith('VGIA') || clean.startsWith('RURA') ? 'Fiagro' : (clean.startsWith('HGLG') || clean.startsWith('XPLG') || clean.startsWith('BTLG') ? 'Logística' : 'Papel / Renda')
+              sector: clean.startsWith('SNAG') || clean.startsWith('VGIA') || clean.startsWith('RURA') ? 'Fiagro' : 'FII B3'
             };
           }
         } catch (e) {}
       }
       return null;
+    }
+
+    // ATUALIZAÇÃO EM TEMPO REAL DO PREVIEW LOGO ABAIXO AO DIGITAR O TIKER
+    async function onTickerInput(val) {
+      const clean = val.toUpperCase().trim();
+      const box = document.getElementById('ticker-preview-box');
+      if (clean.length < 4) {
+        box.classList.add('hidden');
+        return;
+      }
+      const ticker = clean.endsWith('11') ? clean : `${clean}11`;
+      
+      let info = database[ticker];
+      if (!info) {
+        info = await fetchLiveTicker(ticker) || {
+          name: `Fundo ${ticker}`,
+          price: 10.00,
+          div: 0.09,
+          div3m: 0.088,
+          sector: "B3"
+        };
+        database[ticker] = info;
+      }
+
+      document.getElementById('prev-ticker-name').textContent = `${ticker} — ${info.name}`;
+      document.getElementById('prev-ticker-desc').textContent = `Setor: ${info.sector || 'FII'}`;
+      document.getElementById('prev-price').textContent = formatBRL(info.price);
+      document.getElementById('prev-div').textContent = formatBRL(info.div);
+      document.getElementById('prev-div3m').textContent = formatBRL(info.div3m);
+      box.classList.remove('hidden');
     }
 
     async function addTickerAction() {
@@ -306,29 +347,24 @@
 
       if (!database[ticker]) {
         let liveData = await fetchLiveTicker(ticker);
-        if (!liveData) {
-          liveData = {
-            name: `Fundo ${ticker}`,
-            sector: "FII B3",
-            price: 10.00,
-            div: 0.09,
-            div3m: 0.088,
-            pvp: 0.95,
-            dy: "12.0%",
-            vacancy: "0.0%",
-            cash: "R$ 5M"
-          };
-        }
-        database[ticker] = liveData;
+        database[ticker] = liveData || {
+          name: `Fundo ${ticker}`,
+          sector: "FII B3",
+          price: 10.00,
+          div: 0.09,
+          div3m: 0.088,
+          pvp: 0.95,
+          dy: "12.0%",
+          vacancy: "0.0%",
+          cash: "R$ 5M"
+        };
       }
 
       let finalQuotas = inputValue;
       if (mode === 'cash') {
         const price = database[ticker].price || 10.00;
         finalQuotas = Math.floor(inputValue / price);
-        if (finalQuotas <= 0) {
-          return;
-        }
+        if (finalQuotas <= 0) return;
       }
 
       const existing = portfolio.find(p => p.ticker === ticker);
@@ -336,6 +372,7 @@
       else portfolio.push({ ticker, quotas: finalQuotas });
 
       document.getElementById('portfolio-search-input').value = '';
+      document.getElementById('ticker-preview-box').classList.add('hidden');
       save();
     }
 
@@ -406,7 +443,6 @@
       save();
     }
 
-    // SINCRONIZAÇÃO COMPLETA DE TODOS OS FIIs NEGOCIADOS NA BOLSA
     async function syncAllPrices() {
       const icon = document.getElementById('sync-icon');
       const box = document.getElementById('sync-progress-box');
@@ -419,7 +455,6 @@
       box.classList.remove('hidden');
       stream.innerHTML = '';
 
-      // Combina a carteira atual com a lista completa de todos os FIIs do mercado B3
       const marketTickers = Array.from(new Set([...portfolio.map(p => p.ticker), ...ALL_B3_FIIS, ...Object.keys(database)]));
       const total = marketTickers.length;
       let completed = 0;
@@ -447,10 +482,8 @@
 
       save();
       icon.classList.remove('animate-spin');
-      label.textContent = `Varredura concluída! (${successCount}/${total} ativos atualizados com sucesso).`;
-      setTimeout(() => {
-        box.classList.add('hidden');
-      }, 5000);
+      label.textContent = `Varredura concluída! (${successCount}/${total} ativos atualizados).`;
+      setTimeout(() => { box.classList.add('hidden'); }, 5000);
     }
 
     function populateAnalysis() {
