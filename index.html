@@ -25,7 +25,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base font-bold text-white tracking-tight">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro Dynamic</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v18</span>
           </div>
           <p class="text-xs text-slate-400">Engenharia Financeira & Relatórios Gerenciais B3</p>
         </div>
@@ -72,26 +72,34 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-emerald-400"></i> Adicionar FII à Carteira</h2>
-            <p class="text-xs text-slate-400">Digite qualquer ticker listado na B3 para buscar e gerenciar em tempo real.</p>
+            <p class="text-xs text-slate-400">Busque o ticker e escolha se deseja incluir por quantidade de cotas ou valor em dinheiro (R$).</p>
           </div>
           <button onclick="resetPortfolioFixed()" class="text-[11px] px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Restaurar Carteira Fixa</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div class="md:col-span-6 relative">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Pesquisar Ticker (Ex: MXRF11, HGLG11, VISC11)</label>
+          <div class="md:col-span-5 relative">
+            <label class="block text-xs font-medium text-slate-300 mb-1">Pesquisar Ticker (Ex: CPTS11, VGIR11)</label>
             <div class="relative">
               <input type="text" id="portfolio-search-input" placeholder="Digite o ticker..." autocomplete="off" oninput="handleSearchInput(this.value)" onfocus="handleSearchInput(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
               <div id="portfolio-dropdown" class="hidden absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-30 divide-y divide-slate-800"></div>
             </div>
           </div>
 
-          <div class="md:col-span-3">
-            <label class="block text-xs font-medium text-slate-300 mb-1">Qtd. Cotas</label>
-            <input type="number" id="portfolio-qty" min="1" value="10" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500" />
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-slate-300 mb-1">Tipo de Entrada</label>
+            <select id="input-mode" onchange="toggleInputMode()" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <option value="shares">Por Cotas</option>
+              <option value="cash">Por Dinheiro (R$)</option>
+            </select>
           </div>
 
           <div class="md:col-span-3">
+            <label id="input-label" class="block text-xs font-medium text-slate-300 mb-1">Qtd. Cotas</label>
+            <input type="number" id="portfolio-value" min="1" value="10" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500" />
+          </div>
+
+          <div class="md:col-span-2">
             <button onclick="addSelectedTicker()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20">Adicionar</button>
           </div>
         </div>
@@ -140,10 +148,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-sky-400"></i> Relatórios Gerenciais & Dinâmicos B3</h2>
-            <p class="text-xs text-slate-400">Insira ou selecione qualquer ticker para gerar instantaneamente a análise fundamentalista e relatórios.</p>
+            <p class="text-xs text-slate-400">Insira ou selecione qualquer ticker para ver a cotação, média de dividendos (3M) e análise.</p>
           </div>
           <div class="flex items-center gap-2">
-            <input type="text" id="analysis-custom-input" placeholder="Digite Ticker (Ex: MXRF11)..." onkeydown="if(event.key==='Enter') searchAnalysisTicker(this.value)" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white uppercase focus:outline-none focus:border-sky-500" />
+            <input type="text" id="analysis-custom-input" placeholder="Digite Ticker..." onkeydown="if(event.key==='Enter') searchAnalysisTicker(this.value)" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white uppercase focus:outline-none focus:border-sky-500" />
             <select id="analysis-select" onchange="renderAnalysis(this.value)" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white font-semibold uppercase focus:outline-none focus:border-sky-500"></select>
           </div>
         </div>
@@ -176,9 +184,9 @@
   </main>
 
   <script>
-    const VERSION = 'v17_dynamic';
+    const VERSION = 'v18_dynamic_divs';
     
-    // Carteira Fixa Oficial extraída do seu print
+    // Carteira Fixa Oficial baseada no print enviado pelo usuário
     const FIXED_PORTFOLIO = [
       { ticker: "CPTS11", quotas: 290 },
       { ticker: "VGIR11", quotas: 225 },
@@ -189,16 +197,16 @@
 
     let portfolio = JSON.parse(localStorage.getItem(`fii_port_${VERSION}`)) || JSON.parse(JSON.stringify(FIXED_PORTFOLIO));
 
-    // Base dinâmica limpa (apenas registros básicos; relatórios são gerados dinamicamente em tempo de execução)
+    // Base dinâmica com cotação, dividendo atual e média dos últimos 3 meses
     const database = {
-      "CPTS11": { name: "Capitânia Securities II", sector: "Papel / CRI", price: 6.88, div: 0.09, pvp: 0.80, dy: "15.7%", vacancy: "0%", cash: "R$ 45M" },
-      "VGIR11": { name: "Valora Recebíveis", sector: "Papel / CRI", price: 8.50, div: 0.10, pvp: 0.95, dy: "14.1%", vacancy: "0%", cash: "R$ 12M" },
-      "SNEL11": { name: "Suno Energias Limpas", sector: "Infraestrutura", price: 7.24, div: 0.10, pvp: 0.91, dy: "16.5%", vacancy: "0%", cash: "R$ 8M" },
-      "TRXF11": { name: "TRX Real Estate", sector: "Tijolo / Renda", price: 55.79, div: 0.50, pvp: 0.98, dy: "10.7%", vacancy: "0%", cash: "R$ 25M" },
-      "GGRC11": { name: "GGR Covepi Renda", sector: "Logística / Industrial", price: 83.50, div: 0.80, pvp: 0.92, dy: "11.5%", vacancy: "0%", cash: "R$ 15M" },
-      "MXRF11": { name: "Maxi Renda", sector: "Papel / CRI", price: 9.65, div: 0.095, pvp: 1.01, dy: "11.8%", vacancy: "0%", cash: "R$ 30M" },
-      "HGLG11": { name: "CSHG Logística", sector: "Logística", price: 156.80, div: 1.10, pvp: 0.98, dy: "8.4%", vacancy: "3.2%", cash: "R$ 120M" },
-      "VISC11": { name: "Vinci Shopping Centers", sector: "Shoppings", price: 112.20, div: 0.85, pvp: 0.95, dy: "9.1%", vacancy: "4.0%", cash: "R$ 40M" }
+      "CPTS11": { name: "Capitânia Securities II", sector: "Papel / CRI", price: 6.88, div: 0.09, div3m: 0.088, pvp: 0.80, dy: "15.7%", vacancy: "0%", cash: "R$ 45M" },
+      "VGIR11": { name: "Valora Recebíveis", sector: "Papel / CRI", price: 8.50, div: 0.10, div3m: 0.098, pvp: 0.95, dy: "14.1%", vacancy: "0%", cash: "R$ 12M" },
+      "SNEL11": { name: "Suno Energias Limpas", sector: "Infraestrutura", price: 7.24, div: 0.10, div3m: 0.095, pvp: 0.91, dy: "16.5%", vacancy: "0%", cash: "R$ 8M" },
+      "TRXF11": { name: "TRX Real Estate", sector: "Tijolo / Renda", price: 55.79, div: 0.50, div3m: 0.490, pvp: 0.98, dy: "10.7%", vacancy: "0%", cash: "R$ 25M" },
+      "GGRC11": { name: "GGR Covepi Renda", sector: "Logística / Industrial", price: 83.50, div: 0.80, div3m: 0.790, pvp: 0.92, dy: "11.5%", vacancy: "0%", cash: "R$ 15M" },
+      "MXRF11": { name: "Maxi Renda", sector: "Papel / CRI", price: 9.65, div: 0.095, div3m: 0.093, pvp: 1.01, dy: "11.8%", vacancy: "0%", cash: "R$ 30M" },
+      "HGLG11": { name: "CSHG Logística", sector: "Logística", price: 156.80, div: 1.10, div3m: 1.100, pvp: 0.98, dy: "8.4%", vacancy: "3.2%", cash: "R$ 120M" },
+      "VISC11": { name: "Vinci Shopping Centers", sector: "Shoppings", price: 112.20, div: 0.85, div3m: 0.840, pvp: 0.95, dy: "9.1%", vacancy: "4.0%", cash: "R$ 40M" }
     };
 
     let sectorChart = null, snowballChart = null, selectedSearchTicker = "";
@@ -215,6 +223,21 @@
       document.getElementById(`tab-${tab}`).className = "tab-btn px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap";
       if (tab === 'analysis') populateAnalysis();
       if (tab === 'snowball') updateSnowball();
+    }
+
+    function toggleInputMode() {
+      const mode = document.getElementById('input-mode').value;
+      const label = document.getElementById('input-label');
+      const input = document.getElementById('portfolio-value');
+      if (mode === 'cash') {
+        label.textContent = 'Valor em Dinheiro (R$)';
+        input.value = '1000';
+        input.step = '100';
+      } else {
+        label.textContent = 'Qtd. Cotas';
+        input.value = '10';
+        input.step = '1';
+      }
     }
 
     function handleSearchInput(query) {
@@ -246,7 +269,7 @@
       document.getElementById('portfolio-search-input').value = ticker;
       selectedSearchTicker = ticker;
       if (!database[ticker]) {
-        database[ticker] = { name, sector: "Geral", price, div, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+        database[ticker] = { name, sector: "Geral", price, div, div3m: div, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
       }
       document.getElementById('portfolio-dropdown').classList.add('hidden');
     }
@@ -254,16 +277,28 @@
     function addSelectedTicker() {
       const inputVal = document.getElementById('portfolio-search-input').value.toUpperCase().trim();
       const ticker = selectedSearchTicker || (inputVal.endsWith('11') ? inputVal : `${inputVal}11`);
-      const qty = parseInt(document.getElementById('portfolio-qty').value) || 10;
+      const inputValue = parseFloat(document.getElementById('portfolio-value').value) || 10;
+      const mode = document.getElementById('input-mode').value;
+
       if (!ticker || ticker === '11') return;
 
       if (!database[ticker]) {
-        database[ticker] = { name: `Fundo ${ticker}`, sector: "Geral", price: 10.00, div: 0.09, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+        database[ticker] = { name: `Fundo ${ticker}`, sector: "Geral", price: 10.00, div: 0.09, div3m: 0.09, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+      }
+
+      let finalQuotas = inputValue;
+      if (mode === 'cash') {
+        const price = database[ticker].price || 10.00;
+        finalQuotas = Math.floor(inputValue / price);
+        if (finalQuotas <= 0) {
+          alert('O valor em dinheiro é menor que o preço de uma cota deste ativo.');
+          return;
+        }
       }
 
       const existing = portfolio.find(p => p.ticker === ticker);
-      if (existing) existing.quotas += qty;
-      else portfolio.push({ ticker, quotas: qty });
+      if (existing) existing.quotas += finalQuotas;
+      else portfolio.push({ ticker, quotas: finalQuotas });
 
       document.getElementById('portfolio-search-input').value = '';
       selectedSearchTicker = "";
@@ -374,7 +409,7 @@
       if (!clean) return;
       const ticker = clean.endsWith('11') ? clean : `${clean}11`;
       if (!database[ticker]) {
-        database[ticker] = { name: `Fundo ${ticker}`, sector: "B3 Geral", price: 10.00, div: 0.09, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+        database[ticker] = { name: `Fundo ${ticker}`, sector: "B3 Geral", price: 10.00, div: 0.09, div3m: 0.09, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
       }
       populateAnalysis();
       document.getElementById('analysis-select').value = ticker;
@@ -382,15 +417,13 @@
       document.getElementById('analysis-custom-input').value = '';
     }
 
-    // MOTOR DINÂMICO DE RELATÓRIO (Gera os dados na hora para qualquer ticker digitado)
     function renderAnalysis(ticker) {
       let f = database[ticker];
       if (!f) {
-        f = { name: `Fundo ${ticker}`, sector: "Mercado B3", price: 10.00, div: 0.09, pvp: 0.95, dy: "12.0%", vacancy: "0.0%", cash: "R$ 10M" };
+        f = { name: `Fundo ${ticker}`, sector: "Mercado B3", price: 10.00, div: 0.09, div3m: 0.09, pvp: 0.95, dy: "12.0%", vacancy: "0.0%", cash: "R$ 10M" };
         database[ticker] = f;
       }
 
-      // Geração dinâmica dos pontos sem dados pré-gravados
       const positives = [
         `Fluxo de caixa gerencial resiliente e auditado para o ativo ${ticker}`,
         `Liquidez e conformidade regulamentada junto aos padrões da B3`,
@@ -405,8 +438,8 @@
       const body = document.getElementById('analysis-body');
       body.innerHTML = `
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Cotação</span><span class="text-lg font-bold text-white">${formatBRL(f.price)}</span></div>
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Dividendo</span><span class="text-lg font-bold text-emerald-400">${formatBRL(f.div)}</span></div>
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Cotação Atual</span><span class="text-lg font-bold text-white">${formatBRL(f.price)}</span></div>
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Média Div. (3 Meses)</span><span class="text-lg font-bold text-emerald-400">${formatBRL(f.div3m || f.div)}</span></div>
           <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">P/VP & Yield</span><span class="text-lg font-bold text-sky-400">P/VP ${f.pvp || '0.95'} (${f.dy || '12%'})</span></div>
           <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><span class="text-[11px] text-slate-400 block">Vacância & Caixa</span><span class="text-lg font-bold text-amber-400">Vac. ${f.vacancy || '0%'} | ${f.cash || 'R$ 10M'}</span></div>
         </div>
