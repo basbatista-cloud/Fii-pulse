@@ -25,7 +25,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base font-bold text-white tracking-tight">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro Pure</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v14</span>
           </div>
           <p class="text-xs text-slate-400">Gestão de Carteira, Proventos & Relatórios Gerenciais</p>
         </div>
@@ -177,7 +177,6 @@
   <script>
     const VERSION = 'v14_pure';
     
-    // Carteira Fixa Padrão Exigida
     const FIXED_PORTFOLIO = [
       { ticker: "SNAG11", quotas: 200 },
       { ticker: "SNEL11", quotas: 100 },
@@ -186,7 +185,6 @@
 
     let portfolio = JSON.parse(localStorage.getItem(`fii_port_${VERSION}`)) || JSON.parse(JSON.stringify(FIXED_PORTFOLIO));
 
-    // Base Completa e Dinâmica de FIIs da B3 com Relatórios e Indicadores Atualizados
     const database = {
       "SNAG11": { name: "Suno Agro", sector: "Fiagro", price: 9.57, div: 0.12, pvp: 0.97, dy: "15.1%", vacancy: "0%", cash: "R$ 14M",
         positives: ["Pulverização exemplar em cadeias agrícolas", "Isenção de IR para pessoas físicas", "Distribuição estável de R$ 0,12"],
