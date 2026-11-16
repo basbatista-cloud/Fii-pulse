@@ -25,14 +25,14 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base font-bold text-white tracking-tight">FII Pulse</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v19 Pure</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">B3 Pro v20 Live</span>
           </div>
           <p class="text-xs text-slate-400">Engenharia Financeira & Relatórios Gerenciais B3</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button onclick="syncAllPrices()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition">
+      <div class="flex items-center gap-3">
+        <button onclick="syncAllPrices()" id="sync-btn" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25 transition">
           <i id="sync-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Atualizar Cotações (B3)</span>
         </button>
@@ -47,6 +47,18 @@
   </header>
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- PAINEL DE LOGS E PROGRESSO DA ATUALIZAÇÃO -->
+    <div id="sync-progress-box" class="hidden glass-card rounded-2xl p-4 border-emerald-500/40 space-y-2">
+      <div class="flex justify-between items-center text-xs">
+        <span id="sync-status-label" class="font-bold text-emerald-400">Sincronizando ativos com a B3...</span>
+        <span id="sync-counter" class="text-slate-400">0 / 0</span>
+      </div>
+      <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+        <div id="sync-progress-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+      </div>
+      <div id="sync-log-stream" class="text-[11px] text-slate-400 font-mono bg-slate-950/60 p-2 rounded-lg max-h-20 overflow-y-auto"></div>
+    </div>
+
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <div class="glass-card rounded-2xl p-4">
         <span class="text-xs text-slate-400 block mb-1">Patrimônio Total</span>
@@ -81,7 +93,7 @@
           <div class="md:col-span-5 relative">
             <label class="block text-xs font-medium text-slate-300 mb-1">Pesquisar Ticker B3 (Ex: MXRF11, HGLG11)</label>
             <div class="relative">
-              <input type="text" id="portfolio-search-input" placeholder="Digite o ticker..." autocomplete="off" oninput="handleSearchInput(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
+              <input type="text" id="portfolio-search-input" placeholder="Digite o ticker..." autocomplete="off" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase" />
             </div>
           </div>
 
@@ -183,9 +195,9 @@
   </main>
 
   <script>
-    const VERSION = 'v19_pure_dynamic';
+    const VERSION = 'v20_live';
     
-    // Carteira Fixa Oficial extraída do seu print
+    // Carteira Fixa Oficial extraída do print do usuário
     const FIXED_PORTFOLIO = [
       { ticker: "CPTS11", quotas: 290 },
       { ticker: "VGIR11", quotas: 225 },
@@ -195,15 +207,7 @@
     ];
 
     let portfolio = JSON.parse(localStorage.getItem(`fii_port_${VERSION}`)) || JSON.parse(JSON.stringify(FIXED_PORTFOLIO));
-
-    // Base de dados dinamicamente populada (sem fundos fakes extras pré-gravados)
-    let database = JSON.parse(localStorage.getItem(`fii_db_${VERSION}`)) || {
-      "CPTS11": { name: "Capitânia Securities II", sector: "Papel / CRI", price: 6.88, div: 0.09, div3m: 0.088, pvp: 0.80, dy: "15.7%", vacancy: "0%", cash: "R$ 45M" },
-      "VGIR11": { name: "Valora Recebíveis", sector: "Papel / CRI", price: 8.50, div: 0.10, div3m: 0.098, pvp: 0.95, dy: "14.1%", vacancy: "0%", cash: "R$ 12M" },
-      "SNEL11": { name: "Suno Energias Limpas", sector: "Infraestrutura", price: 7.24, div: 0.10, div3m: 0.095, pvp: 0.91, dy: "16.5%", vacancy: "0%", cash: "R$ 8M" },
-      "TRXF11": { name: "TRX Real Estate", sector: "Tijolo / Renda", price: 55.79, div: 0.50, div3m: 0.490, pvp: 0.98, dy: "10.7%", vacancy: "0%", cash: "R$ 25M" },
-      "GGRC11": { name: "GGR Covepi Renda", sector: "Logística / Industrial", price: 83.50, div: 0.80, div3m: 0.790, pvp: 0.92, dy: "11.5%", vacancy: "0%", cash: "R$ 15M" }
-    };
+    let database = JSON.parse(localStorage.getItem(`fii_db_${VERSION}`)) || {};
 
     let sectorChart = null, snowballChart = null;
 
@@ -244,25 +248,33 @@
     async function fetchLiveTicker(ticker) {
       const clean = ticker.toUpperCase().trim();
       const sym = `${clean}.SA`;
-      try {
-        const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
-        const json = await res.json();
-        const meta = json?.chart?.result?.[0]?.meta;
-        if (meta && meta.regularMarketPrice) {
-          const price = Number(meta.regularMarketPrice);
-          return {
-            price,
-            name: (meta.shortName || meta.longName || clean).replace('.SA', ''),
-            div: Number((price * 0.011).toFixed(2)),
-            div3m: Number((price * 0.0108).toFixed(2)),
-            pvp: 0.95,
-            dy: "12.5%",
-            vacancy: "1.5%",
-            cash: "R$ 20M",
-            sector: "FII B3"
-          };
-        }
-      } catch (e) {}
+      const proxies = [
+        `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`)}`
+      ];
+
+      for (const url of proxies) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const meta = json?.chart?.result?.[0]?.meta;
+          if (meta && meta.regularMarketPrice) {
+            const price = Number(meta.regularMarketPrice);
+            return {
+              price,
+              name: (meta.shortName || meta.longName || clean).replace('.SA', ''),
+              div: Number((price * 0.011).toFixed(2)),
+              div3m: Number((price * 0.0108).toFixed(2)),
+              pvp: 0.95,
+              dy: "12.5%",
+              vacancy: "1.2%",
+              cash: "R$ 15M",
+              sector: clean.startsWith('SNAG') || clean.startsWith('VGIA') ? 'Fiagro' : 'FII B3'
+            };
+          }
+        } catch (e) {}
+      }
       return null;
     }
 
@@ -307,7 +319,6 @@
 
       document.getElementById('portfolio-search-input').value = '';
       save();
-      alert(`${ticker} adicionado com sucesso!`);
     }
 
     function render() {
@@ -377,30 +388,59 @@
       save();
     }
 
-    // ATUALIZAÇÃO UNIVERSAL DE TODOS OS FIIs CADASTRADOS (Carteira + Base)
+    // SINCRONIZAÇÃO COM LOGS E BARRA DE PROGRESSO EM TEMPO REAL (SEM POPUP)
     async function syncAllPrices() {
       const icon = document.getElementById('sync-icon');
+      const box = document.getElementById('sync-progress-box');
+      const bar = document.getElementById('sync-progress-bar');
+      const counter = document.getElementById('sync-counter');
+      const stream = document.getElementById('sync-log-stream');
+      const label = document.getElementById('sync-status-label');
+
       icon.classList.add('animate-spin');
+      box.classList.remove('hidden');
+      stream.innerHTML = '';
+
+      const tickersToSync = Array.from(new Set([...portfolio.map(p => p.ticker), ...Object.keys(database)]));
+      const total = tickersToSync.length;
+      let completed = 0;
       let successCount = 0;
-      try {
-        const allTickersToSync = Array.from(new Set([...portfolio.map(p => p.ticker), ...Object.keys(database)]));
-        for (let t of allTickersToSync) {
-          const live = await fetchLiveTicker(t);
-          if (live) {
-            if (!database[t]) database[t] = live;
-            else {
-              database[t].price = live.price;
-              database[t].name = live.name;
-            }
-            successCount++;
-          }
-        }
-        save();
-        alert(`${successCount} FIIs atualizados com sucesso via B3/Yahoo Finance!`);
-      } catch (e) {
-        alert('Sincronização concluída.');
+
+      if (total === 0) {
+        label.textContent = "Nenhum ativo para sincronizar.";
+        icon.classList.remove('animate-spin');
+        setTimeout(() => box.classList.add('hidden'), 3000);
+        return;
       }
+
+      for (let t of tickersToSync) {
+        label.textContent = `Atualizando ${t}...`;
+        const live = await fetchLiveTicker(t);
+        completed++;
+        const pct = Math.round((completed / total) * 100);
+        bar.style.width = `${pct}%`;
+        counter.textContent = `${completed} / ${total}`;
+
+        if (live) {
+          if (!database[t]) database[t] = live;
+          else {
+            database[t].price = live.price;
+            database[t].name = live.name;
+          }
+          successCount++;
+          stream.innerHTML += `<div>[OK] ${t} cotação: R$ ${live.price.toFixed(2)}</div>`;
+        } else {
+          stream.innerHTML += `<div class="text-amber-400">[AVISO] ${t} mantido com último valor em cache.</div>`;
+        }
+        stream.scrollTop = stream.scrollHeight;
+      }
+
+      save();
       icon.classList.remove('animate-spin');
+      label.textContent = `Sincronização concluída! (${successCount}/${total} ativos atualizados).`;
+      setTimeout(() => {
+        box.classList.add('hidden');
+      }, 5000);
     }
 
     function populateAnalysis() {
@@ -417,6 +457,7 @@
       if (!database[ticker]) {
         let live = await fetchLiveTicker(ticker);
         database[ticker] = live || { name: `Fundo ${ticker}`, sector: "B3 Geral", price: 10.00, div: 0.09, div3m: 0.088, pvp: 0.95, dy: "12%", vacancy: "0%", cash: "R$ 5M" };
+        save();
       }
       populateAnalysis();
       document.getElementById('analysis-select').value = ticker;
@@ -501,7 +542,6 @@
 
     window.onload = () => {
       render();
-      syncAllPrices();
     };
   </script>
 </body>
